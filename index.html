@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1c1c1e">
+<title>Kardeş Zorbalama</title>
+<meta name="description" content="Kardeşin dert anlatır, sen en bariz soruyu sorarsın. Kutunun kapağını açmış mıydın?">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Kardeş Zorbalama 😈">
+<meta property="og:description" content="Kutunun kapağını açmış mıydın? Abi ile kardeşin bariz soru düellosu.">
+<meta property="og:url" content="https://elnidal.github.io/kardes-zorbalama/">
+<meta property="og:image" content="https://elnidal.github.io/kardes-zorbalama/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E😈%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&display=swap">
+<style>
+/* Layout: a dark messaging-app column over a doodle wallpaper of the things sisters call about; the paper court verdict is the one break from it. */
+:root {
+  color-scheme: dark;
+  --ground: #0b0b0d;
+  --bar: #1c1c1e;
+  --bar-line: #2e2e32;
+  --incoming: #262629;
+  --outgoing: #005c4b;
+  --green: #25d366;
+  --on-green: #06281a;
+  --tick: #53bdeb;
+  --hot: #ff5c7a;
+  --text: #f2f2f4;
+  --muted: #a3a3ab;
+  --bubble-meta: #b4c9c3;
+  --notice: #ffd279;
+  --notice-bg: #2a2518;
+  --paper: #f6ecd8;
+  --ink: #2b1a20;
+  --ink-soft: #6b5457;
+  --stamp: #c4233b;
+  --doodle: none;
+  --display: "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+  --body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+html { height: 100%; }
+body { height: 100%; height: 100dvh; margin: 0; background: var(--ground); color: var(--text); font: 400 16px/1.35 var(--body); overflow: hidden; }
+body::before { content: ""; position: fixed; inset: 0; z-index: -1; background: var(--doodle) 0 0 / 300px 300px; filter: grayscale(1); opacity: .11; }
+button, input { font: inherit; }
+button { cursor: pointer; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 3px solid var(--tick); outline-offset: 2px; }
+
+.screen { height: 100%; max-width: 520px; margin-inline: auto; }
+.gutter, #start, #verdict {
+  padding-left: max(14px, env(safe-area-inset-left, 0px));
+  padding-right: max(14px, env(safe-area-inset-right, 0px));
+}
+
+/* Bubbles */
+.msg { position: relative; display: flow-root; max-width: 84%; padding: 7px 10px 6px 11px; border-radius: 15px; overflow-wrap: anywhere; animation: pop .18s ease-out; }
+.msg.in { align-self: flex-start; background: var(--incoming); }
+.msg.out { align-self: flex-end; background: var(--outgoing); }
+.msg.tail.in { border-bottom-left-radius: 4px; }
+.msg.tail.out { border-bottom-right-radius: 4px; }
+.msg.tail::before { content: ""; position: absolute; bottom: 0; width: 0; height: 0; border-top: 9px solid transparent; }
+.msg.tail.in::before { left: -6px; border-right: 7px solid var(--incoming); }
+.msg.tail.out::before { right: -6px; border-left: 7px solid var(--outgoing); }
+.meta { float: right; margin: 6px 0 -2px 10px; font-size: 11px; line-height: 1.2; color: var(--muted); font-variant-numeric: tabular-nums; }
+.msg.out .meta { color: var(--bubble-meta); }
+.ticks { letter-spacing: -3px; padding-right: 3px; font-weight: 700; }
+.ticks.read { color: var(--tick); }
+.msg.reacted { margin-bottom: 16px; }
+.reaction { position: absolute; left: 10px; bottom: -17px; padding: 1px 6px; font-size: 14px; line-height: 1.35; border-radius: 12px; background: var(--bar); border: 1px solid var(--bar-line); animation: slam .3s ease-out; }
+
+/* Start */
+#start { overflow-y: auto; padding-block: 22px; display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--green); margin: 0; }
+h1 { font: 800 clamp(50px, 15vw, 68px)/.9 var(--display); margin: 6px 0 0; color: var(--text); }
+h1 span { display: block; color: var(--green); }
+.pitch { margin: 10px 0 0; color: var(--muted); max-width: 40ch; }
+.demo { display: flex; flex-direction: column; gap: 4px; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-weight: 700; font-size: 14px; }
+.field input { width: 100%; padding: 12px 16px; font-size: 16px; color: var(--text); background: var(--bar); border: 1px solid var(--bar-line); border-radius: 22px; }
+.field input::placeholder { color: var(--muted); }
+.modes { display: flex; flex-direction: column; gap: 10px; }
+.mode { text-align: left; padding: 13px 16px; border-radius: 16px; border: 1px solid var(--bar-line); background: var(--bar); color: var(--text); display: flex; flex-direction: column; gap: 1px; }
+.mode b { font: 800 22px/1.2 var(--display); }
+.mode small { font-size: 14px; color: var(--muted); }
+.mode.primary { background: var(--green); border-color: var(--green); color: var(--on-green); }
+.mode.primary small { color: var(--on-green); }
+.mode:active, .reply:active { transform: scale(.985); }
+
+/* Chat screen */
+#game { display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; }
+.head { display: flex; align-items: center; gap: 9px; padding-block: 9px; background: var(--bar); }
+.back { flex: none; display: grid; place-items: center; width: 34px; height: 40px; border: 0; padding: 0; background: none; color: var(--tick); }
+.back svg, .call svg { display: block; }
+.avatar { flex: none; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: linear-gradient(145deg, var(--tick), #7c6cf0); color: #fff; font: 800 21px/1 var(--display); }
+.who { min-width: 0; flex: 1; }
+.who b { display: block; font-size: 16px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.who span { display: block; font-size: 12.5px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.calls { flex: none; display: flex; gap: 2px; }
+.call { display: grid; place-items: center; width: 38px; height: 40px; border: 0; padding: 0; background: none; color: var(--tick); }
+.metre { padding-block: 7px 9px; background: var(--bar); border-top: 1px solid var(--bar-line); border-bottom: 1px solid var(--bar-line); }
+.metre-label { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; margin-bottom: 5px; }
+.metre-label b { color: var(--text); }
+.metre-track { height: 6px; border-radius: 3px; background: var(--bar-line); overflow: hidden; }
+.metre-fill { height: 100%; width: 0; background: var(--green); border-radius: 3px; transition: width .5s ease; }
+.metre-fill.hot { background: var(--hot); }
+#chat { overflow-y: auto; display: flex; flex-direction: column; gap: 4px; padding-block: 12px; }
+.chip { align-self: center; max-width: 90%; margin-block: 7px; padding: 4px 11px; border-radius: 9px; font-size: 12.5px; font-weight: 600; color: var(--muted); background: var(--bar); text-align: center; animation: pop .18s ease-out; }
+.chip.day { margin-top: 0; }
+.chip.notice { color: var(--notice); background: var(--notice-bg); font-weight: 400; }
+.chip.good { color: var(--green); }
+.chip.twist { color: #fff; background: var(--hot); font: 800 17px/1.3 var(--display); padding: 5px 15px; animation: slam .35s ease-out; }
+.typing { display: flex; gap: 4px; padding-block: 12px; }
+.typing i { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); animation: blink 1s infinite; }
+.typing i:nth-child(2) { animation-delay: .15s; }
+.typing i:nth-child(3) { animation-delay: .3s; }
+#tray { padding-block: 8px 12px; display: flex; flex-direction: column; gap: 7px; background: var(--bar); border-top: 1px solid var(--bar-line); }
+.composer { display: flex; align-items: center; gap: 10px; color: var(--tick); }
+.plus { flex: none; font-size: 22px; line-height: 1; }
+.fake-input { flex: 1; min-width: 0; padding: 7px 14px; font-size: 15px; border-radius: 18px; background: var(--incoming); color: var(--muted); }
+.timer { height: 4px; border-radius: 2px; background: var(--bar-line); overflow: hidden; }
+.timer i { display: block; height: 100%; background: var(--hot); transform-origin: left; }
+.tray-label { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; font-weight: 600; color: var(--muted); margin: 0; font-variant-numeric: tabular-nums; }
+.tray-label b { color: var(--hot); }
+.reply { text-align: left; padding: 10px 14px; border-radius: 15px; line-height: 1.3; background: var(--incoming); color: var(--text); border: 1px solid var(--bar-line); }
+.reply:hover { border-color: var(--green); }
+
+/* Verdict */
+#verdict { overflow-y: auto; padding-block: 22px; display: flex; flex-direction: column; gap: 14px; }
+.paper { background: var(--paper); color: var(--ink); padding: 22px 20px; border-radius: 3px; display: flex; flex-direction: column; gap: 12px; }
+.paper h2 { margin: 0; font: 800 26px/1.1 var(--display); text-align: center; }
+.docket { font-size: 13px; color: var(--ink-soft); text-align: center; margin: -8px 0 0; font-variant-numeric: tabular-nums; }
+.parties { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; border-block: 1px solid var(--ink); padding-block: 8px; font-size: 14px; }
+.parties > span { min-width: 0; overflow-wrap: anywhere; }
+.counts { margin: 0; display: grid; grid-template-columns: 1fr auto; gap: 3px 16px; font-size: 15px; }
+.counts dt { color: var(--ink-soft); }
+.counts dd { margin: 0; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
+.ruling { margin: 0; font-size: 14px; color: var(--ink-soft); }
+.rank-wrap { position: relative; display: flex; flex-direction: column; gap: 8px; }
+.rank { margin: 0; padding-right: 104px; min-height: 58px; font: 800 32px/1.05 var(--display); text-wrap: balance; }
+.rank-line, .total { margin: 0; }
+.total { font-size: 14px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.stamp { position: absolute; right: -4px; top: 2px; transform: rotate(-12deg); border: 3px solid var(--stamp); color: var(--stamp); border-radius: 6px; padding: 0 7px; font: 800 22px/1.35 var(--display); letter-spacing: .04em; opacity: .9; animation: slam .4s ease-out; }
+.actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn { display: block; text-align: center; text-decoration: none; padding: 12px 10px; border-radius: 14px; font-weight: 700; font-size: 15px; background: var(--bar); color: var(--text); border: 1px solid var(--bar-line); }
+.btn.primary { grid-column: 1 / -1; background: var(--green); border-color: var(--green); color: var(--on-green); font: 800 20px/1.2 var(--display); }
+.btn.wide { grid-column: 1 / -1; }
+#shareText { margin: 0; font-size: 14px; color: var(--muted); user-select: all; overflow-wrap: anywhere; }
+
+@keyframes pop { from { transform: translateY(6px); opacity: .3; } }
+@keyframes slam { from { transform: scale(1.7); opacity: 0; } }
+@keyframes blink { 50% { opacity: .3; } }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<section id="start" class="screen">
+  <div>
+    <p class="eyebrow">Abi Destek Hattı 📞</p>
+    <h1>Kardeş <span>Zorbalama 😈</span></h1>
+    <p class="pitch">Kardeşin dert anlatır. Sen ilk aklına gelen en bariz soruyu en hızlı şekilde sorarsın. Yardım edersen puan kaybedersin.</p>
+  </div>
+  <div class="demo" aria-label="Örnek konuşma">
+    <div class="msg in tail">Hadi dinlen kahveni iç ve beni zorbalamaya başla ☕<span class="meta">18:58</span></div>
+    <div class="msg out">Kutunun kapağını açmış mıydın?<span class="meta">18:58 <span class="ticks read">✓✓</span></span></div>
+    <div class="msg out tail reacted">Jelatini çıkarmış mıydın?<span class="meta">18:58 <span class="ticks read">✓✓</span></span><span class="reaction">🤬</span></div>
+  </div>
+  <div class="field">
+    <label for="nameInput">Kardeşin adı</label>
+    <input id="nameInput" type="text" maxlength="16" placeholder="Örn. Ayşe" autocomplete="off">
+  </div>
+  <div class="modes">
+    <button class="mode primary" id="playAbi" type="button"><b>😈 Abi ol, zorbala</b><small>Kardeşinin dertlerine bariz sorularla yetiş.</small></button>
+    <button class="mode" id="playRevenge" type="button"><b>🔥 Kardeş ol, intikam al</b><small>Bu kez sorun abide. Sıra sende.</small></button>
+  </div>
+</section>
+
+<section id="game" class="screen" hidden>
+  <header class="head gutter">
+    <button class="back" id="quit" type="button" aria-label="Oyundan çık"><svg width="13" height="22" viewBox="0 0 13 22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 2 2 11l9 9"/></svg></button>
+    <div class="avatar" id="avatar" aria-hidden="true"></div>
+    <div class="who"><b id="contact"></b><span id="status">çevrimiçi</span></div>
+    <div class="calls">
+      <button class="call" id="callVideo" type="button" aria-label="Görüntülü ara"><svg width="26" height="20" viewBox="0 0 26 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="1.5" y="3" width="15" height="14" rx="3.5"/><path d="m17 8 7-4v12l-7-4z"/></svg></button>
+      <button class="call" id="callVoice" type="button" aria-label="Sesli ara"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M6.6 2.5 9.8 8l-2.1 2.2a14 14 0 0 0 6.1 6.1l2.2-2.1 5.5 3.2-1 3.3c-.3 1-1.2 1.6-2.2 1.5C10 21.500 2.500 14 1.800 5.700c-.1-1 .5-1.900 1.500-2.200z"/></svg></button>
+    </div>
+  </header>
+  <div class="metre gutter">
+    <div class="metre-label"><span>📌 Zorba-metre <b id="pct">%0</b> <span id="moodFace">😇</span></span><span id="roundNo"></span></div>
+    <div class="metre-track"><div class="metre-fill" id="fill"></div></div>
+  </div>
+  <div id="chat" class="gutter" aria-live="polite"></div>
+  <div id="tray" class="gutter"></div>
+</section>
+
+<section id="verdict" class="screen" hidden>
+  <div class="paper">
+    <h2>⚖️ Kardeş Mahkemesi</h2>
+    <p class="docket" id="docket"></p>
+    <div class="parties"><span id="plaintiff"></span><span id="accused"></span></div>
+    <dl class="counts" id="counts"></dl>
+    <p class="ruling">Mahkeme, delilleri inceledi ve şu unvana karar verdi:</p>
+    <div class="rank-wrap">
+      <p class="rank" id="rank"></p>
+      <div class="stamp" id="stamp"></div>
+      <p class="rank-line" id="rankLine"></p>
+      <p class="total" id="total"></p>
+    </div>
+  </div>
+  <div class="actions">
+    <button class="btn primary" id="again" type="button">🔁 Bir daha oyna</button>
+    <button class="btn" id="swap" type="button">🔄 Tarafı değiştir</button>
+    <button class="btn" id="copy" type="button">📋 Sonucu kopyala</button>
+    <a class="btn wide" id="wa" target="_blank" rel="noopener">💬 WhatsApp'ta paylaş</a>
+  </div>
+  <p id="shareText"></p>
+</section>
+
+<script>
+const ABI_REQUIRED = [
+  { m: "Abicim yazıcıyı aldık ama bluetooth'la bir türlü bağlanamadım 😩",
+    b: "Bluetooth'u açmış mıydın {ad}?", o: "Yazıcı fişte mi {ad}?", y: "Eşleşmeyi silip yeniden dene. Olmazsa modelini at, bakayım.",
+    rb: "ABİ. Bluetooth'un ne olduğunu biliyorum yani. 😤", tw: ["bi dakika", "açık değilmiş. kimseye söyleme 🤫"] },
+  { m: "Abi araba çalışmıyor, yolda kaldım 😭",
+    b: "Benzin koymuş muydun {ad}?", o: "Anahtarı çevirdin mi {ad}?", y: "Marş sesi geliyor mu? Akü olabilir, yol yardımını arayalım.",
+    rb: "Arabanın benzinle çalıştığını biliyorum abi, sağ ol. 🙄", tw: ["gösterge niye kırmızı yanıyor ki", "tamam abi. benzin bitmiş. 🫣"] },
+  { m: "Bilgisayarım çalışmıyor, yarın da teslimim var 😰",
+    b: "Şarjı var mıydı {ad}?", o: "Kapağını açtın mı {ad}?", y: "Güç tuşuna 30 saniye basılı tut, sonra adaptörle aç.",
+    rb: "Yarın teslimim var diyorum, sen şarj diyorsun. 🤦‍♀️", tw: ["adaptör prize takılı değilmiş", "bunu duymadın 🤐"] }
+];
+const ABI_POOL = [
+  { m: "İnternet yok abi, hiçbir şey açılmıyor 😫",
+    b: "Uçak modunda kalmış olmasın {ad}?", o: "Modem hâlâ evde mi {ad}?", y: "Modemi 10 saniye kapatıp aç, ışıkları söyle.",
+    rb: "Uçakta mıyım abi ben? ✈️", tw: ["ay", "dün geceden kalmış. kapattım."] },
+  { m: "Kumanda çalışmıyor, kanalı değiştiremiyorum 📺",
+    b: "Pilleri takmış mıydın {ad}?", o: "Televizyona doğru tutuyor musun {ad}?", y: "Pilleri değiştir, kumandayı telefon kamerasından kontrol et.",
+    rb: "Hayır abi, kumandayı üflüyorum. 🙃", tw: ["içinde pil yokmuş", "annem almış herhalde"] },
+  { m: "Kek pişmedi abi, içi cıvık kaldı 🥲",
+    b: "Fırını açmış mıydın {ad}?", o: "Keki fırına koymuş muydun {ad}?", y: "170 derece alt üst ateşte 10 dakika daha pişir, kürdanla bak.",
+    rb: "Ben sana bir daha tarif sormayacağım. 😒", tw: ["fırın açıkmış ama", "sadece lambası. neyse."] },
+  { m: "Telefonum çalmıyor, bütün aramaları kaçırıyorum 📵",
+    b: "Sessizde olmasın {ad}?", o: "Seni arayan biri var mıydı {ad}?", y: "Odaklanma modunu ve engellenen numaraları kontrol et.",
+    rb: "O kadar da aptal değilim abi. 😠", tw: ["bi bakayım", "ses kapalıymış. bu aramayı unutalım."] },
+  { m: "Çamaşır makinesi çalışmıyor abi, su da almıyor 🧺",
+    b: "Fişi takılı mı {ad}?", o: "İçine çamaşır koydun mu {ad}?", y: "Musluğu ve kapak kilidini kontrol et, hata kodu varsa at.",
+    rb: "Abi fişin ne olduğunu 1998'den beri biliyorum. 🔌", tw: ["fiş takılı", "ama priz anahtarı kapalıymış"] },
+  { m: "Hesabıma giremiyorum, şifre yanlış diyor 🔐",
+    b: "Caps Lock açık mı {ad}?", o: "Doğru şifreyi yazdın mı {ad}?", y: "Şifremi unuttum'dan sıfırla, mail gelmezse spam'e bak.",
+    rb: "Doğru şifreyi yazmak aklıma hiç gelmedi abi, teşekkürler. 👏", tw: ["Caps Lock", "KONUŞMAYALIM. 🙈"] },
+  { m: "Kulaklıktan ses gelmiyor abi, yeni aldım 🎧",
+    b: "Kulağına takmış mıydın {ad}?", o: "Sesi açtın mı {ad}?", y: "Telefonun ses çıkışını kulaklığa al, eşleşmeyi yenile.",
+    rb: "Abi ben bunu ailemize anlatacağım. 📢", tw: ["ses en kısıktaymış", "şikâyetimi geri çekiyorum"] }
+];
+const ABI_FINAL = {
+  m: "Uydu alıcısını aldım ama kuramadım. Hadi dinlen kahveni iç ve beni zorbalamaya başla ☕",
+  b: "Kutunun kapağını açmış mıydın {ad}?", o: "Jelatini çıkarmış mıydın {ad}?", y: "HDMI'yı tak, kanal aramasını başlat, takıldığın yerde ara.",
+  rb: "Bu mesajları bir gün mahkemede kullanacağım. ⚖️😂", final: true
+};
+
+const REV_POOL = [
+  { m: "Kod çalışmıyor, üç saattir uğraşıyorum 😤",
+    b: "Bilgisayarı açmış mıydın abi?", o: "Kapatıp açtın mı abi?", y: "Hata mesajını oku, son değişikliği geri al abi.",
+    rb: "Çok komik. Üç saattir bunu mu bekliyordun?", tw: ["bi saniye", "dosyayı kaydetmemişim."] },
+  { m: "Kahve makinesi kahve yapmıyor ☕",
+    b: "Kahve koymuş muydun abi?", o: "Suyunu doldurdun mu abi?", y: "Haznesini temizle, kireç tutmuş olabilir abi.",
+    rb: "Ben sana ne yaptım?", tw: ["hazne boşmuş", "ama bunu büyütmeyelim"] },
+  { m: "Anahtarlarımı bulamıyorum, evden çıkamıyorum 🔑",
+    b: "Elinde olmasın abi?", o: "Cebine baktın mı abi?", y: "En son nerede kullandıysan oraya bak abi.",
+    rb: "Ciddi bir şey soruyorum, ciddiyetini bozma.", tw: ["ya", "elimdeymiş. 🫠"] },
+  { m: "Toplantıda kimse beni duymuyor 🎙️",
+    b: "Mikrofonu açtın mı abi?", o: "Toplantıda kimse var mı abi?", y: "Ses girişinden doğru mikrofonu seç abi.",
+    rb: "Kaç yıldır bilgisayar kullanıyorum biliyor musun?", tw: ["sessizdeymişim", "yirmi dakikadır konuşuyormuşum"] },
+  { m: "Yemek hiç tat vermedi, bir şey eksik 🍲",
+    b: "Tuz koymuş muydun abi?", o: "Yemeği sen mi yaptın abi?", y: "Biraz limon ve tuz ekle, kaynat abi.",
+    rb: "Bu kadar basit olsa seni aramazdım.", tw: ["tuzluk doluymuş", "hiç açmamışım demek ki"] },
+  { m: "Ekran kapkara, görüntü gelmiyor 🖥️",
+    b: "Monitörün fişi takılı mı abi?", o: "Gözlerini açtın mı abi?", y: "Kablonun iki ucunu çıkarıp yeniden tak abi.",
+    rb: "Beni kaç yaşında sanıyorsun?", tw: ["kablo gevşemiş", "şimdi geldi. aramadım say."] },
+  { m: "Su ısıtıcısı ısıtmıyor, çay içemiyorum 🫖",
+    b: "İçine su koydun mu abi?", o: "Düğmesine bastın mı abi?", y: "Tabanına tam oturduğundan emin ol abi.",
+    rb: "Söylediğim şeye gel, çay içemiyorum diyorum.", tw: ["düğmesine basmamışım", "çay için teşekkürler"] },
+  { m: "Telefonun şarjı dolmuyor 🔋",
+    b: "Prize takmış mıydın abi?", o: "Şarj aleti sende mi abi?", y: "Kabloyu değiştir, girişin tozunu temizle abi.",
+    rb: "İntikam alıyorsun, anladım.", tw: ["prizin anahtarı kapalıymış", "sus 🤐"] }
+];
+const REV_FINAL = {
+  m: "Yazıcı aldım, bluetooth'la bağlanamadım. Sen bu işlerden anlarsın, bir bak 🖨️",
+  b: "Bluetooth'u açmış mıydın abi?", o: "Kutunun kapağını açmış mıydın abi?", y: "Eşleşmeyi silip yeniden dene abi.",
+  rb: "Tamam anladım. Mesaj alındı.", final: true
+};
+
+const REACT_MID = ["Abi bak gerçekten sinirleniyorum. 😡", "Beni kaç yaşında sanıyorsun? 😑", "Bunu bana annem bile sormadı. 🙄", "Bir de bunun için kahve molası verdin. ☕😒", "Bu soruyu sorarken yüzün gülüyor, görüyorum. 👀"];
+const REACT_MID_REV = ["Sen nereden öğrendin bu tavrı?", "Komik. Çok komik. 😐", "Bunu benden öğrendin, değil mi?", "Annemi arıyorum. 📞"];
+const REACT_HELP = ["Aa, işe yaradı. Sen iyi misin? 🥹", "Teşekkürler. Hasta mısın? 🤒", "Bu kadar nazik olman beni korkuttu. 😳", "Bir şey mi istiyorsun? 🤨"];
+const REACT_LATE = ["Görüldü atma, tikleri görüyorum. 👀", "Mesajı okudun, biliyorum.", "Cevap vermemek de zorbalıktır. 😤"];
+
+const ROUNDS = 7, TIME_LIMIT = 8000;
+const $ = id => document.getElementById(id);
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const trCap = s => s ? s[0].toLocaleUpperCase("tr") + s.slice(1) : s;
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+};
+
+const S = { run: 0, mode: "abi", name: "", score: 0, n: {} };
+let timer = null;
+
+function show(id) { for (const s of ["start", "game", "verdict"]) $(s).hidden = s !== id; }
+const fill = t => t.replaceAll("{ad}", S.name);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const scrollDown = () => { const c = $("chat"); c.scrollTop = c.scrollHeight; };
+function add(cls, text) {
+  const d = document.createElement("div");
+  d.className = cls; d.textContent = text;
+  $("chat").append(d); scrollDown();
+  return d;
+}
+const clock = () => new Date().toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
+function bubble(side, text) {
+  const prev = $("chat").lastElementChild;
+  if (prev && prev.classList.contains(side)) prev.classList.remove("tail");
+  const d = document.createElement("div");
+  d.className = "msg tail " + side;
+  d.append(text);
+  const meta = document.createElement("span");
+  meta.className = "meta";
+  meta.textContent = clock();
+  if (side === "out") {
+    const t = document.createElement("span");
+    t.className = "ticks"; t.textContent = "✓✓"; t.setAttribute("aria-label", "iletildi");
+    meta.append(" ", t);
+  }
+  d.append(meta);
+  $("chat").append(d); scrollDown();
+  return d;
+}
+function react(el, emoji) {
+  const t = el.querySelector(".ticks");
+  if (t) { t.classList.add("read"); t.setAttribute("aria-label", "görüldü"); }
+  if (!emoji) return;
+  const r = document.createElement("span");
+  r.className = "reaction"; r.textContent = emoji;
+  el.append(r); el.classList.add("reacted"); scrollDown();
+}
+const pct = () => Math.min(100, Math.round(S.score / (ROUNDS * 150) * 100));
+function moodStatus() {
+  const p = pct();
+  return p < 20 ? "çevrimiçi" : p < 45 ? "biraz gergin" : p < 70 ? "sinirli" : p < 90 ? "anneye şikâyet ediyor" : "seni engellemek üzere";
+}
+function updateMetre() {
+  const p = pct();
+  $("pct").textContent = "%" + p;
+  $("fill").style.width = p + "%";
+  $("fill").classList.toggle("hot", p >= 70);
+  $("moodFace").textContent = p < 20 ? "😇" : p < 45 ? "🙂" : p < 70 ? "😏" : p < 90 ? "😈" : "👹";
+  $("status").textContent = moodStatus();
+}
+
+async function incoming(text, run) {
+  $("status").textContent = "yazıyor…";
+  const t = document.createElement("div");
+  t.className = "msg in tail typing";
+  t.setAttribute("aria-label", "yazıyor");
+  t.innerHTML = "<i></i><i></i><i></i>";
+  $("chat").append(t); scrollDown();
+  await sleep(Math.min(1300, 450 + text.length * 11));
+  t.remove();
+  if (run !== S.run) return false;
+  bubble("in", text);
+  $("status").textContent = moodStatus();
+  return true;
+}
+
+function composer() {
+  const c = document.createElement("div");
+  c.className = "composer"; c.setAttribute("aria-hidden", "true");
+  c.innerHTML = '<span class="plus">+</span><span class="fake-input">Cevap düşünülüyor…</span><span class="plus">🎤</span>';
+  $("tray").replaceChildren(c);
+}
+
+function ask(round) {
+  return new Promise(resolve => {
+    const tray = $("tray");
+    tray.replaceChildren();
+    const start = performance.now();
+    const done = kind => {
+      clearInterval(timer);
+      const left = Math.max(0, 1 - (performance.now() - start) / TIME_LIMIT);
+      composer();
+      resolve({ kind, left });
+    };
+    const label = document.createElement("p");
+    label.className = "tray-label";
+    const secs = document.createElement("b");
+    secs.textContent = Math.ceil(TIME_LIMIT / 1000) + " sn";
+    label.textContent = "⏱️ Çabuk, ilk aklına geleni sor";
+    const bar = document.createElement("div");
+    bar.className = "timer";
+    const barFill = document.createElement("i");
+    bar.append(barFill);
+    label.append(secs);
+    tray.append(label, bar);
+    for (const kind of shuffle(["b", "o", "y"])) {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "reply"; b.textContent = fill(round[kind]);
+      b.addEventListener("click", () => done(kind));
+      tray.append(b);
+    }
+    scrollDown();
+    timer = setInterval(() => {
+      const left = 1 - (performance.now() - start) / TIME_LIMIT;
+      barFill.style.transform = "scaleX(" + Math.max(0, left) + ")";
+      secs.textContent = Math.max(0, Math.ceil(left * TIME_LIMIT / 1000)) + " sn";
+      if (left <= 0) done("late");
+    }, 50);
+  });
+}
+
+function buildRounds() {
+  if (S.mode === "abi") {
+    const extra = shuffle(ABI_POOL).slice(0, ROUNDS - 1 - ABI_REQUIRED.length);
+    return [...shuffle([...ABI_REQUIRED, ...extra]), ABI_FINAL];
+  }
+  return [...shuffle(REV_POOL).slice(0, ROUNDS - 1), REV_FINAL];
+}
+
+async function play(mode) {
+  S.mode = mode;
+  S.run++;
+  const run = S.run;
+  clearInterval(timer);
+  const typed = $("nameInput").value.trim();
+  store.set("kz-name", typed);
+  S.name = typed || "kardeşim";
+  S.score = 0;
+  S.n = { b: 0, o: 0, y: 0, late: 0, twist: 0 };
+  const contact = mode === "abi" ? (typed ? trCap(typed) : "Kardeşim") : "Abi";
+  $("contact").textContent = contact;
+  $("avatar").textContent = contact[0];
+  $("chat").replaceChildren();
+  composer();
+  add("chip day", "Bugün");
+  add("chip notice", "🔒 Mesajlar uçtan uca zorbalanmaktadır. Bu sohbetten kimse kurtulamaz.");
+  updateMetre();
+  show("game");
+
+  const rounds = buildRounds();
+  const twistEligible = rounds.filter(r => r.tw);
+  const sureTwist = pick(twistEligible);
+  const mid = mode === "abi" ? REACT_MID : REACT_MID_REV;
+
+  for (let i = 0; i < rounds.length; i++) {
+    const r = rounds[i];
+    $("roundNo").textContent = (i + 1) + " / " + rounds.length;
+    if (!await incoming(r.m, run)) return;
+    const { kind, left } = await ask(r);
+    if (run !== S.run) return;
+
+    if (kind === "late") {
+      S.n.late++; S.score += 20; updateMetre();
+      add("chip", "👀 Görüldü bıraktın · +20");
+      if (!await incoming(pick(REACT_LATE), run)) return;
+    } else {
+      const sent = bubble("out", fill(r[kind]));
+      await sleep(350);
+      if (run !== S.run) return;
+      if (kind === "b") {
+        S.n.b++;
+        const pts = 100 + Math.round(50 * left);
+        const twisted = r.tw && (r === sureTwist || Math.random() < 0.2);
+        if (twisted) {
+          react(sent);
+          if (!await incoming(r.tw[0], run)) return;
+          if (!await incoming(r.tw[1], run)) return;
+          react(sent, "🤫");
+          S.n.twist++; S.score += pts * 2; updateMetre();
+          add("chip twist", "🎯 HAKLI ÇIKTIN · ×2 · +" + (pts * 2));
+        } else {
+          react(sent, pick(["😡", "🤬", "🙄", "🤦‍♀️", "😤"]));
+          if (!await incoming(r.rb, run)) return;
+          S.score += pts; updateMetre();
+          add("chip good", "😈 En bariz soru · +" + pts);
+        }
+      } else if (kind === "o") {
+        S.n.o++;
+        const pts = 50 + Math.round(25 * left);
+        react(sent, pick(["😒", "🙄", "😑"]));
+        if (!await incoming(pick(mid), run)) return;
+        S.score += pts; updateMetre();
+        add("chip good", "😏 Fena bariz · +" + pts);
+      } else {
+        S.n.y++;
+        react(sent, pick(["🥹", "😳", "❤️"]));
+        if (!await incoming(pick(REACT_HELP), run)) return;
+        add("chip", "😇 Gerçekten yardım ettin · +0");
+      }
+    }
+    await sleep(650);
+    if (run !== S.run) return;
+  }
+  add("chip", "⚖️ Mahkeme toplanıyor…");
+  await sleep(1300);
+  if (run !== S.run) return;
+  showVerdict();
+}
+
+function tier(p) {
+  if (S.mode === "abi") {
+    if (p < 20) return ["😇 Örnek Abi", "Kardeşin sana teşekkür etti. Bu kadar yardım şüphe uyandırdı."];
+    if (p < 45) return ["🐣 Stajyer Zorba", "Niyet var, bariz soru kası henüz gelişmemiş."];
+    if (p < 70) return ["🧐 Kıdemli Soru Sorucu", "Fişi sormadan telefonu kapatmıyorsun."];
+    if (p < 90) return ["🎓 Zorba Profesörü", "Karşındakinin bluetooth'unu sesinden anlıyorsun."];
+    return ["🕵️ Jelatin Müfettişi", "Kutu açılmadan konuşma başlamaz. Ceza: Kardeşine bir kahve ısmarlamak."];
+  }
+  if (p < 20) return ["😇 Fazla Melek Kardeş", "Abine yardım ettin. O bunu asla yapmazdı."];
+  if (p < 45) return ["🐣 Çırak İntikamcı", "Abi hafif rahatsız oldu. Devam et."];
+  if (p < 70) return ["🧹 Abi Terbiyecisi", "Abi artık aramadan önce fişe bakıyor."];
+  if (p < 90) return ["👑 Aile Şefi", "Abi seni aramaktan çekinmeye başladı."];
+  return ["⚖️ Jelatin Adaleti Temsilcisi", "Yıllarca süren zorbalığın bedeli tek oyunda ödendi."];
+}
+
+function showVerdict() {
+  const p = pct();
+  const [title, line] = tier(p);
+  const key = "kz-best-" + S.mode;
+  const best = Math.max(S.score, Number(store.get(key)) || 0);
+  store.set(key, String(best));
+  const named = trCap(S.name);
+  $("docket").textContent = "Dava no: 2026/" + (100 + Math.floor(Math.random() * 900));
+  $("plaintiff").textContent = "Davacı: " + (S.mode === "abi" ? named : "Abi");
+  $("accused").textContent = "Sanık: " + (S.mode === "abi" ? "Abi" : named);
+  const rows = [["En bariz soru", S.n.b], ["Fena bariz soru", S.n.o], ["Haklı çıkma", S.n.twist], ["Gerçek yardım", S.n.y], ["Görüldü bırakma", S.n.late]];
+  $("counts").replaceChildren(...rows.flatMap(([k, v]) => {
+    const dt = document.createElement("dt"); dt.textContent = k;
+    const dd = document.createElement("dd"); dd.textContent = v;
+    return [dt, dd];
+  }));
+  $("rank").textContent = title;
+  $("rankLine").textContent = line;
+  $("total").textContent = S.score + " puan · Zorba-metre %" + p + " · En iyi: " + best;
+  $("stamp").textContent = p < 20 ? "BERAAT" : "SUÇLU";
+  const url = location.protocol.startsWith("http") ? " " + location.origin + location.pathname : "";
+  const text = "Kardeş Zorbalama'da " + S.score + " puan aldım. Kardeş Mahkemesi'nin kararı: " + title + ". Kutunun kapağını açmış mıydın? 😈" + url;
+  $("shareText").textContent = text;
+  $("wa").href = "https://wa.me/?text=" + encodeURIComponent(text);
+  $("copy").textContent = "📋 Sonucu kopyala";
+  show("verdict");
+  $("verdict").scrollTop = 0;
+}
+
+$("playAbi").addEventListener("click", () => play("abi"));
+$("playRevenge").addEventListener("click", () => play("revenge"));
+$("again").addEventListener("click", () => play(S.mode));
+$("swap").addEventListener("click", () => play(S.mode === "abi" ? "revenge" : "abi"));
+for (const id of ["callVideo", "callVoice"]) $(id).addEventListener("click", () => add("chip", "📵 Bu hatta arama yok. Yazılı zorbalama geçerlidir."));
+$("quit").addEventListener("click", () => { S.run++; clearInterval(timer); show("start"); });
+$("copy").addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText($("shareText").textContent);
+    $("copy").textContent = "Kopyalandı";
+  } catch (e) {
+    const range = document.createRange();
+    range.selectNodeContents($("shareText"));
+    const sel = getSelection(); sel.removeAllRanges(); sel.addRange(range);
+    $("copy").textContent = "Metni seçtim, kopyala";
+  }
+});
+
+const doodles = ["🖨️", "⛽", "🔌", "📦", "☕", "🔋", "📡", "🎧", "🔑", "📺", "🧺", "🎂"];
+const doodleSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300">' + doodles.map((e, i) =>
+  '<text x="' + (18 + (i % 4) * 72 + (i % 2) * 8) + '" y="' + (58 + Math.floor(i / 4) * 92 + (i % 3) * 12) + '" font-size="30" transform="rotate(' + ((i * 37) % 50 - 25) + ' ' + (32 + (i % 4) * 72) + ' ' + (48 + Math.floor(i / 4) * 92) + ')">' + e + '</text>').join("") + '</svg>';
+document.documentElement.style.setProperty("--doodle", 'url("data:image/svg+xml,' + encodeURIComponent(doodleSvg) + '")');
+
+let fromHash = "";
+try { fromHash = decodeURIComponent(location.hash.slice(1)); } catch (e) {}
+$("nameInput").value = /^[a-zA-Z-]{1,16}$/.test(fromHash) ? trCap(fromHash) : (store.get("kz-name") || "");
+</script>
+</body>
+</html>
