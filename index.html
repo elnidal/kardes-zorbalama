@@ -27,6 +27,7 @@
   --bar-line: #2e2e32;
   --incoming: #262629;
   --outgoing: #005c4b;
+  --outgoing-line: #0f7a65;
   --green: #25d366;
   --on-green: #06281a;
   --tick: #53bdeb;
@@ -129,7 +130,7 @@ h1 span { display: block; color: var(--green); }
 .timer i { display: block; height: 100%; background: var(--hot); transform-origin: left; }
 .tray-label { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; font-weight: 600; color: var(--muted); margin: 0; font-variant-numeric: tabular-nums; }
 .tray-label b { color: var(--hot); }
-.reply { text-align: left; padding: 10px 14px; border-radius: 15px; line-height: 1.3; background: var(--incoming); color: var(--text); border: 1px solid var(--bar-line); }
+.reply { align-self: flex-end; max-width: 92%; text-align: left; padding: 10px 14px; border-radius: 15px; border-bottom-right-radius: 4px; line-height: 1.3; background: var(--outgoing); color: var(--text); border: 1px solid var(--outgoing-line); }
 .reply:hover { border-color: var(--green); }
 
 /* Verdict */
