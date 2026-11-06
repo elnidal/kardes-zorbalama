@@ -41,6 +41,7 @@
   --ink: #2b1a20;
   --ink-soft: #6b5457;
   --stamp: #c4233b;
+  --stamp-mom: #1f5fbf;
   --doodle: none;
   --display: "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
   --body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -75,6 +76,15 @@ button { cursor: pointer; }
 .ticks.read { color: var(--tick); }
 .msg.reacted { margin-bottom: 16px; }
 .reaction { position: absolute; left: 10px; bottom: -17px; padding: 1px 6px; font-size: 14px; line-height: 1.35; border-radius: 12px; background: var(--bar); border: 1px solid var(--bar-line); animation: slam .3s ease-out; }
+
+/* Voice message */
+.voice { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 10px; align-items: center; width: 270px; max-width: 84%; }
+.voice-play { width: 34px; height: 34px; padding: 0; border: 0; border-radius: 50%; background: var(--text); color: var(--ground); font-size: 13px; line-height: 1; }
+.bars { display: flex; align-items: center; gap: 2px; height: 30px; overflow: hidden; }
+.bars i { flex: 1 1 0; min-width: 2px; border-radius: 1px; background: var(--muted); }
+.voice.playing .bars i { animation: heard .4s linear forwards; }
+.voice-foot { grid-column: 2; display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.sender { display: block; margin-bottom: 1px; font-size: 13px; font-weight: 700; color: var(--notice); }
 
 /* Start */
 #start { overflow-y: auto; padding-block: 22px; display: flex; flex-direction: column; gap: 18px; }
@@ -145,10 +155,13 @@ h1 span { display: block; color: var(--green); }
 .counts dd { margin: 0; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
 .ruling { margin: 0; font-size: 14px; color: var(--ink-soft); }
 .rank-wrap { position: relative; display: flex; flex-direction: column; gap: 8px; }
-.rank { margin: 0; padding-right: 104px; min-height: 58px; font: 800 32px/1.05 var(--display); text-wrap: balance; }
+.rank { margin: 0; padding-right: 112px; min-height: 80px; font: 800 32px/1.05 var(--display); text-wrap: balance; }
 .rank-line, .total { margin: 0; }
 .total { font-size: 14px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
 .stamp { position: absolute; right: -4px; top: 2px; transform: rotate(-12deg); border: 3px solid var(--stamp); color: var(--stamp); border-radius: 6px; padding: 0 7px; font: 800 22px/1.35 var(--display); letter-spacing: .04em; opacity: .9; animation: slam .4s ease-out; }
+.stamp.overruled { opacity: .35; text-decoration: line-through; }
+.stamp.mom-stamp { top: 40px; right: -8px; transform: rotate(7deg); border-color: var(--stamp-mom); color: var(--stamp-mom); font-size: 20px; animation: none; }
+.mom-ruling { align-self: flex-start; max-width: 92%; font-size: 16px; animation: slam .3s ease-out; }
 .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .btn { display: block; text-align: center; text-decoration: none; padding: 12px 10px; border-radius: 14px; font-weight: 700; font-size: 15px; background: var(--bar); color: var(--text); border: 1px solid var(--bar-line); }
 .btn.primary { grid-column: 1 / -1; background: var(--green); border-color: var(--green); color: var(--on-green); font: 800 20px/1.2 var(--display); }
@@ -157,6 +170,7 @@ h1 span { display: block; color: var(--green); }
 
 @keyframes pop { from { transform: translateY(6px); opacity: .3; } }
 @keyframes slam { from { transform: scale(1.7); opacity: 0; } }
+@keyframes heard { to { background: var(--tick); } }
 @keyframes blink { 50% { opacity: .3; } }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 </style>
@@ -189,6 +203,7 @@ h1 span { display: block; color: var(--green); }
     <div class="avatar" id="avatar" aria-hidden="true"></div>
     <div class="who"><b id="contact"></b><span id="status">çevrimiçi</span></div>
     <div class="calls">
+      <button class="call" id="soundBtn" type="button" aria-label="Sesi aç veya kapat">🔊</button>
       <button class="call" id="callVideo" type="button" aria-label="Görüntülü ara"><svg width="26" height="20" viewBox="0 0 26 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="1.5" y="3" width="15" height="14" rx="3.5"/><path d="m17 8 7-4v12l-7-4z"/></svg></button>
       <button class="call" id="callVoice" type="button" aria-label="Sesli ara"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M6.6 2.5 9.8 8l-2.1 2.2a14 14 0 0 0 6.1 6.1l2.2-2.1 5.5 3.2-1 3.3c-.3 1-1.2 1.6-2.2 1.5C10 21.500 2.500 14 1.800 5.700c-.1-1 .5-1.900 1.500-2.200z"/></svg></button>
     </div>
@@ -211,14 +226,17 @@ h1 span { display: block; color: var(--green); }
     <div class="rank-wrap">
       <p class="rank" id="rank"></p>
       <div class="stamp" id="stamp"></div>
+      <div class="stamp mom-stamp" id="momStamp" hidden>BOZULDU</div>
       <p class="rank-line" id="rankLine"></p>
       <p class="total" id="total"></p>
     </div>
   </div>
+  <div class="msg in tail mom-ruling" id="momRuling" hidden><span class="sender">Annem</span><span id="momRulingText"></span></div>
   <div class="actions">
     <button class="btn primary" id="again" type="button">🔁 Bir daha oyna</button>
     <button class="btn" id="swap" type="button">🔄 Tarafı değiştir</button>
     <button class="btn" id="copy" type="button">📋 Sonucu kopyala</button>
+    <button class="btn wide" id="shareImg" type="button" disabled>🖼️ Karar görseli hazırlanıyor…</button>
     <a class="btn wide" id="wa" target="_blank" rel="noopener">💬 WhatsApp'ta paylaş</a>
   </div>
   <p id="shareText"></p>
@@ -302,6 +320,35 @@ const REACT_MID_REV = ["Sen nereden öğrendin bu tavrı?", "Komik. Çok komik. 
 const REACT_HELP = ["Aa, işe yaradı. Sen iyi misin? 🥹", "Teşekkürler. Hasta mısın? 🤒", "Bu kadar nazik olman beni korkuttu. 😳", "Bir şey mi istiyorsun? 🤨"];
 const REACT_LATE = ["Görüldü atma, tikleri görüyorum. 👀", "Mesajı okudun, biliyorum.", "Cevap vermemek de zorbalıktır. 😤"];
 
+const ABI_VOICE = [
+  { voice: "0:47", b: "Fişi takılı mıydı {ad}?", o: "Kapatıp açtın mı {ad}?", y: "Dur, baştan anlat {ad}, dinliyorum.",
+    rb: "Abi 47 saniye annemin doğum gününü anlattım. Ne fişi? 🎂", ro: "Neyi kapatıp açayım abi? Annemin doğum günü diyorum. 🎂", ry: "Yine dinlemedin, değil mi? 😑" },
+  { voice: "1:32", b: "Şarjı var mıydı {ad}?", o: "Jelatinini çıkardın mı {ad}?", y: "Sesli dinleyemiyorum, yazsana {ad}.",
+    rb: "Bir buçuk dakika iş yerindeki kavgayı anlattım. Ne şarjı abi? 😤", ro: "Kavgadan bahsediyorum abi. Ne jelatini? 😤", ry: "Bir buçuk dakika boşuna konuştum yani. 🙃" },
+  { voice: "0:58", b: "Bluetooth'u açmış mıydın {ad}?", o: "Benzin koymuş muydun {ad}?", y: "Az sonra dinleyeceğim {ad}, söz.",
+    rb: "Abi tatil planı yapıyoruz. Bluetooth nereden çıktı? 🏖️", ro: "Otobüsle gidiyoruz abi tatile, benzin bende değil. 🚌", ry: "Bunu geçen ay da dedin. 🙄" }
+];
+const REV_VOICE = [
+  { voice: "0:58", b: "Fişi takılı mıydı abi?", o: "Kapatıp açtın mı abi?", y: "Dur, baştan anlat abi, dinliyorum.",
+    rb: "58 saniye önemli bir şey anlattım. Ne fişi? 😤", ro: "Neyi kapatıp açayım? Tapu işini anlatıyorum. 📄", ry: "Dinlemiyorsun, biliyorum. Benden öğrendin. 😑" },
+  { voice: "1:14", b: "Şarjı var mıydı abi?", o: "Jelatinini çıkardın mı abi?", y: "Yaz abi, dinleyemiyorum.",
+    rb: "Bir dakika ev sahibini anlattım. Ne şarjı? 😤", ro: "Ev sahibinin jelatini mi olur? 🙄", ry: "Sesli mesaj atan herkesi anlıyorum şimdi. 🥲" }
+];
+const MOM_EVENT = {
+  abi: { m: ["Kardeşine niye öyle diyorsun? 😠", "Oğlum yardım et şu kıza, ne soruyorsun öyle? 😠", "Telefonu kardeşin gösterdi. Ayıp değil mi? 😠"],
+    b: "Ben sadece soru sordum anne 😇", o: "Önce o başlattı anne", y: "Haklısın anne, özür dilerim",
+    rb: "Sorunu ben bilmez miyim senin? 😒", ro: "İkinize de yemek yok. 🍽️", ry: "Aferin oğlum. Madem pişmansın, çöpü de at. 🗑️" },
+  revenge: { m: ["Abine öyle deme, o senin abin. 😠", "Kızım abin şimdi ne yapsın fişi? 😠", "Abin ağlıyor burada, ne yazdın ona? 😠"],
+    b: "Ben sadece soru sordum anne 😇", o: "Önce o başlattı anne", y: "Haklısın anne, özür dilerim",
+    rb: "Bu soruları kimden öğrendiğini biliyorum. 😒", ro: "İkinize de yemek yok. 🍽️", ry: "Aferin kızım. Madem pişmansın, sofrayı da kur. 🍽️" },
+  late: "Anneni de mi görüldüye atıyorsun? 😱"
+};
+const MOM_RULE = {
+  abi: ["Bu kadar iyi davranıyorsan kesin bir şey istiyorsun. Beraat iptal.", "Kardeşine bir de böyle mi diyorsun? Karar iptal.", "Fişi sorma, git kardeşinin yanına. Karar iptal.", "Bu mahkemeyi ben kurmadım, o yüzden geçersiz. Yine de ayıp ettin.", "Mahkeme de kim oluyormuş? Bu evin hâkimi benim. Karar bozuldu."],
+  revenge: ["Bu kadar melek olma, abin şımarıyor. Karar iptal.", "Abine biraz daha yüklenebilirdin. Karar iptal.", "Abine öyle deme. Ama fişi sormakla iyi yapmışsın. Karar iptal.", "Bu soruları nereden öğrendiğini biliyorum. Karar iptal.", "Mahkeme de kim oluyormuş? Bu evin hâkimi benim. Karar bozuldu."]
+};
+const MOM_PENALTY = ["Akşam çöpü sen atacaksın. 🗑️", "Bulaşık sende. 🍽️", "Ben sizin yaşınızdayken fişi kendim takardım. 🔌"];
+
 const ROUNDS = 7, TIME_LIMIT = 13000;
 const $ = id => document.getElementById(id);
 const pick = a => a[Math.floor(Math.random() * a.length)];
@@ -315,6 +362,40 @@ const store = {
 const S = { run: 0, mode: "abi", name: "", score: 0, n: {} };
 let timer = null;
 
+let audio = null;
+let soundOn = store.get("kz-sound") !== "off";
+function ensureAudio() {
+  if (!soundOn) return;
+  try {
+    audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+    if (audio.state === "suspended") audio.resume();
+  } catch (e) { audio = null; }
+}
+function tone(freq, dur, type = "sine", gain = .12, at = 0, slideTo = 0) {
+  if (!soundOn || !audio) return;
+  try {
+    const t = audio.currentTime + at, o = audio.createOscillator(), g = audio.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t);
+    if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t + dur);
+    g.gain.setValueAtTime(gain, t); g.gain.exponentialRampToValueAtTime(.001, t + dur);
+    o.connect(g).connect(audio.destination); o.start(t); o.stop(t + dur);
+  } catch (e) {}
+}
+function buzz(pattern) { if (soundOn) { try { navigator.vibrate && navigator.vibrate(pattern); } catch (e) {} } }
+const sfx = {
+  incoming() { tone(740, .09); tone(990, .12, "sine", .1, .07); },
+  sent() { tone(420, .13, "sine", .1, 0, 860); },
+  tick() { tone(1200, .04, "square", .04); },
+  twist() { [523, 659, 784, 1047].forEach((f, i) => tone(f, .18, "triangle", .14, i * .09)); buzz([60, 40, 120]); },
+  mom() { tone(196, .22, "sawtooth", .08); tone(165, .3, "sawtooth", .08, .2); buzz([120, 60, 120]); },
+  stamp() { tone(110, .22, "square", .2, 0, 45); buzz(50); },
+  mumble() { for (let i = 0; i < 16; i++) tone(130 + Math.random() * 230, .08, "square", .035, i * .1); }
+};
+function renderSoundBtn() {
+  $("soundBtn").textContent = soundOn ? "🔊" : "🔇";
+  $("soundBtn").setAttribute("aria-pressed", String(soundOn));
+}
+
 function show(id) { for (const s of ["start", "game", "verdict"]) $(s).hidden = s !== id; }
 const fill = t => t.replaceAll("{ad}", S.name);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -326,11 +407,16 @@ function add(cls, text) {
   return d;
 }
 const clock = () => new Date().toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
-function bubble(side, text) {
+function bubble(side, text, sender) {
   const prev = $("chat").lastElementChild;
   if (prev && prev.classList.contains(side)) prev.classList.remove("tail");
   const d = document.createElement("div");
   d.className = "msg tail " + side;
+  if (sender) {
+    const n = document.createElement("span");
+    n.className = "sender"; n.textContent = sender;
+    d.append(n);
+  }
   d.append(text);
   const meta = document.createElement("span");
   meta.className = "meta";
@@ -342,6 +428,40 @@ function bubble(side, text) {
   }
   d.append(meta);
   $("chat").append(d); scrollDown();
+  if (side === "out") sfx.sent(); else sfx.incoming();
+  return d;
+}
+function voiceBubble(duration) {
+  const prev = $("chat").lastElementChild;
+  if (prev && prev.classList.contains("in")) prev.classList.remove("tail");
+  const d = document.createElement("div");
+  d.className = "msg in tail voice";
+  d.setAttribute("aria-label", "Sesli mesaj, " + duration);
+  const play = document.createElement("button");
+  play.type = "button"; play.className = "voice-play"; play.textContent = "▶"; play.setAttribute("aria-label", "Sesli mesajı oynat");
+  const bars = document.createElement("div");
+  bars.className = "bars"; bars.setAttribute("aria-hidden", "true");
+  for (let i = 0; i < 30; i++) {
+    const b = document.createElement("i");
+    b.style.height = 18 + Math.round(Math.abs(Math.sin(i * 1.7 + Math.random())) * 82) + "%";
+    b.style.animationDelay = (i * .05) + "s";
+    bars.append(b);
+  }
+  const foot = document.createElement("div");
+  foot.className = "voice-foot";
+  const dur = document.createElement("span"); dur.textContent = duration;
+  const at = document.createElement("span"); at.textContent = clock();
+  foot.append(dur, at);
+  d.append(play, bars, foot);
+  play.addEventListener("click", () => {
+    if (d.classList.contains("playing")) return;
+    d.classList.add("playing");
+    play.textContent = "⏸";
+    sfx.mumble();
+    add("chip", "⏳ Bu mesaj " + duration + " sürüyor. Sen yine de dinlemeden cevap ver.");
+  });
+  $("chat").append(d); scrollDown();
+  sfx.incoming();
   return d;
 }
 function react(el, emoji) {
@@ -366,8 +486,8 @@ function updateMetre() {
   $("status").textContent = moodStatus();
 }
 
-async function incoming(text, run) {
-  $("status").textContent = "yazıyor…";
+async function incoming(text, run, sender) {
+  $("status").textContent = sender ? "Annem yazıyor…" : "yazıyor…";
   const t = document.createElement("div");
   t.className = "msg in tail typing";
   t.setAttribute("aria-label", "yazıyor");
@@ -376,7 +496,16 @@ async function incoming(text, run) {
   await sleep(Math.min(1300, 450 + text.length * 11));
   t.remove();
   if (run !== S.run) return false;
-  bubble("in", text);
+  bubble("in", text, sender);
+  $("status").textContent = moodStatus();
+  return true;
+}
+async function incomingVoice(r, run) {
+  $("status").textContent = "ses kaydediyor…";
+  await sleep(1100);
+  if (run !== S.run) return false;
+  voiceBubble(r.voice);
+  add("chip", "🎧 Dinlemeden cevap ver");
   $("status").textContent = moodStatus();
   return true;
 }
@@ -388,7 +517,7 @@ function composer() {
   $("tray").replaceChildren(c);
 }
 
-function ask(round) {
+function ask(round, prompt) {
   return new Promise(resolve => {
     const tray = $("tray");
     tray.replaceChildren();
@@ -403,7 +532,7 @@ function ask(round) {
     label.className = "tray-label";
     const secs = document.createElement("b");
     secs.textContent = Math.ceil(TIME_LIMIT / 1000) + " sn";
-    label.textContent = "⏱️ Çabuk, ilk aklına geleni sor";
+    label.textContent = prompt || "⏱️ Çabuk, ilk aklına geleni sor";
     const bar = document.createElement("div");
     bar.className = "timer";
     const barFill = document.createElement("i");
@@ -417,10 +546,13 @@ function ask(round) {
       tray.append(b);
     }
     scrollDown();
+    let lastSecs = Math.ceil(TIME_LIMIT / 1000);
     timer = setInterval(() => {
       const left = 1 - (performance.now() - start) / TIME_LIMIT;
       barFill.style.transform = "scaleX(" + Math.max(0, left) + ")";
-      secs.textContent = Math.max(0, Math.ceil(left * TIME_LIMIT / 1000)) + " sn";
+      const nowSecs = Math.max(0, Math.ceil(left * TIME_LIMIT / 1000));
+      if (nowSecs !== lastSecs) { lastSecs = nowSecs; if (nowSecs > 0 && nowSecs <= 3) sfx.tick(); }
+      secs.textContent = nowSecs + " sn";
       if (left <= 0) done("late");
     }, 50);
   });
@@ -428,13 +560,47 @@ function ask(round) {
 
 function buildRounds() {
   if (S.mode === "abi") {
-    const extra = shuffle(ABI_POOL).slice(0, ROUNDS - 1 - ABI_REQUIRED.length);
-    return [...shuffle([...ABI_REQUIRED, ...extra]), ABI_FINAL];
+    const extra = shuffle(ABI_POOL).slice(0, ROUNDS - 2 - ABI_REQUIRED.length);
+    return [...shuffle([...ABI_REQUIRED, ...extra, pick(ABI_VOICE)]), ABI_FINAL];
   }
-  return [...shuffle(REV_POOL).slice(0, ROUNDS - 1), REV_FINAL];
+  return [...shuffle([...shuffle(REV_POOL).slice(0, ROUNDS - 2), pick(REV_VOICE)]), REV_FINAL];
+}
+
+async function momEvent(run) {
+  const ev = MOM_EVENT[S.mode];
+  const joined = add("chip notice", "👩 Annem gruba katıldı");
+  joined.setAttribute("role", "status");
+  sfx.mom();
+  await sleep(700);
+  if (run !== S.run) return false;
+  if (!await incoming(pick(ev.m), run, "Annem")) return false;
+  const { kind } = await ask(ev, "👩 Anneye cevap ver, çabuk");
+  if (run !== S.run) return false;
+  S.mom = kind;
+  if (kind === "late") {
+    S.score = Math.max(0, S.score - 20);
+    add("chip", "😱 Anneni görüldüye attın · −20");
+    if (!await incoming(MOM_EVENT.late, run, "Annem")) return false;
+  } else {
+    const sent = bubble("out", ev[kind]);
+    await sleep(350);
+    if (run !== S.run) return false;
+    react(sent, kind === "y" ? "❤️" : "😒");
+    if (!await incoming(ev["r" + kind], run, "Annem")) return false;
+    const delta = kind === "b" ? 50 : kind === "o" ? 30 : -30;
+    S.score = Math.max(0, S.score + delta);
+    add(delta > 0 ? "chip good" : "chip", (delta > 0 ? "😈 Anneye kafa tuttun · +" + delta : "🙇 Anneye boyun eğdin · −" + -delta));
+  }
+  updateMetre();
+  await sleep(500);
+  if (run !== S.run) return false;
+  add("chip notice", "👩 Annem gruptan ayrıldı");
+  await sleep(600);
+  return run === S.run;
 }
 
 async function play(mode) {
+  ensureAudio();
   S.mode = mode;
   S.run++;
   const run = S.run;
@@ -444,6 +610,7 @@ async function play(mode) {
   S.name = typed || "kardeşim";
   S.score = 0;
   S.n = { b: 0, o: 0, y: 0, late: 0, twist: 0 };
+  S.mom = "";
   const contact = mode === "abi" ? (typed ? trCap(typed) : "Kardeşim") : "Abi";
   $("contact").textContent = contact;
   $("avatar").textContent = contact[0];
@@ -458,12 +625,14 @@ async function play(mode) {
   const twistEligible = rounds.filter(r => r.tw);
   const sureTwist = pick(twistEligible);
   const mid = mode === "abi" ? REACT_MID : REACT_MID_REV;
+  const momAfter = 1 + Math.floor(Math.random() * 4);
 
   for (let i = 0; i < rounds.length; i++) {
     const r = rounds[i];
     $("roundNo").textContent = (i + 1) + " / " + rounds.length;
-    if (!await incoming(r.m, run)) return;
-    const { kind, left } = await ask(r);
+    if (r.voice) { if (!await incomingVoice(r, run)) return; }
+    else if (!await incoming(r.m, run)) return;
+    const { kind, left } = await ask(r, r.voice ? "🎧 Dinlemeye vakit yok, cevap ver" : "");
     if (run !== S.run) return;
 
     if (kind === "late") {
@@ -484,6 +653,7 @@ async function play(mode) {
           if (!await incoming(r.tw[1], run)) return;
           react(sent, "🤫");
           S.n.twist++; S.score += pts * 2; updateMetre();
+          sfx.twist();
           add("chip twist", "🎯 HAKLI ÇIKTIN · ×2 · +" + (pts * 2));
         } else {
           react(sent, pick(["😡", "🤬", "🙄", "🤦‍♀️", "😤"]));
@@ -495,18 +665,19 @@ async function play(mode) {
         S.n.o++;
         const pts = 50 + Math.round(25 * left);
         react(sent, pick(["😒", "🙄", "😑"]));
-        if (!await incoming(pick(mid), run)) return;
+        if (!await incoming(r.ro || pick(mid), run)) return;
         S.score += pts; updateMetre();
         add("chip good", "😏 Fena bariz · +" + pts);
       } else {
         S.n.y++;
         react(sent, pick(["🥹", "😳", "❤️"]));
-        if (!await incoming(pick(REACT_HELP), run)) return;
-        add("chip", "😇 Gerçekten yardım ettin · +0");
+        if (!await incoming(r.ry || pick(REACT_HELP), run)) return;
+        add("chip", r.voice ? "🙃 Dinler gibi yaptın · +0" : "😇 Gerçekten yardım ettin · +0");
       }
     }
     await sleep(650);
     if (run !== S.run) return;
+    if (i === momAfter && !await momEvent(run)) return;
   }
   add("chip", "⚖️ Mahkeme toplanıyor…");
   await sleep(1300);
@@ -529,7 +700,129 @@ function tier(p) {
   return ["⚖️ Jelatin Adaleti Temsilcisi", "Yıllarca süren zorbalığın bedeli tek oyunda ödendi."];
 }
 
+function tierIndex(p) { return p < 20 ? 0 : p < 45 ? 1 : p < 70 ? 2 : p < 90 ? 3 : 4; }
+function momRulingText(p) {
+  const rule = MOM_RULE[S.mode][tierIndex(p)];
+  if (S.mom === "late") return rule + " Beni görüldüye attığın için bulaşık da sende. 🍽️";
+  if (S.mom === "y") return rule + " Bana hak verdiğin için cezanı yarıya indirdim. 🙂";
+  return rule + " " + pick(MOM_PENALTY);
+}
+
+function wrapLines(ctx, text, maxW) {
+  const lines = [];
+  let line = "";
+  for (const word of text.split(" ")) {
+    const test = line ? line + " " + word : word;
+    if (line && ctx.measureText(test).width > maxW) { lines.push(line); line = word; }
+    else line = test;
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+function paintVerdict(ctx, d, H, paperBottom) {
+  const W = 1080, L = 100, R = 980, IW = R - L;
+  const SYS = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
+  const DISP = '"Baloo 2", "Trebuchet MS", sans-serif';
+  const INK = "#2b1a20", SOFT = "#6b5457";
+  ctx.fillStyle = "#0b0b0d"; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = "#f6ecd8"; ctx.fillRect(50, 50, W - 100, paperBottom - 50);
+  let y = 145;
+  ctx.textAlign = "center"; ctx.fillStyle = INK; ctx.font = "800 66px " + DISP;
+  ctx.fillText("⚖️ Kardeş Mahkemesi", W / 2, y);
+  y += 50; ctx.fillStyle = SOFT; ctx.font = "30px " + SYS;
+  ctx.fillText(d.docket, W / 2, y);
+  ctx.textAlign = "left";
+  y += 38; ctx.fillStyle = INK; ctx.fillRect(L, y, IW, 2);
+  y += 52; ctx.font = "32px " + SYS;
+  ctx.fillText(d.plaintiff, L, y);
+  ctx.textAlign = "right"; ctx.fillText(d.accused, R, y); ctx.textAlign = "left";
+  y += 26; ctx.fillRect(L, y, IW, 2);
+  y += 58;
+  for (const [k, v] of d.rows) {
+    ctx.fillStyle = SOFT; ctx.font = "34px " + SYS; ctx.fillText(k, L, y);
+    ctx.fillStyle = INK; ctx.font = "700 34px " + SYS; ctx.textAlign = "right"; ctx.fillText(String(v), R, y); ctx.textAlign = "left";
+    y += 50;
+  }
+  y += 34;
+  const rankTop = y - 62;
+  ctx.fillStyle = INK; ctx.font = "800 76px " + DISP;
+  for (const l of wrapLines(ctx, d.title, IW - 270)) { ctx.fillText(l, L, y); y += 82; }
+  y = Math.max(y, rankTop + 220);
+  const stamp = (label, color, cx, cy, deg, alpha, size, strike) => {
+    ctx.save();
+    ctx.translate(cx, cy); ctx.rotate(deg * Math.PI / 180); ctx.globalAlpha = alpha;
+    ctx.font = "800 " + size + "px " + DISP; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    const w = ctx.measureText(label).width + 36, h = size * 1.4;
+    ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 6;
+    ctx.strokeRect(-w / 2, -h / 2, w, h);
+    ctx.fillText(label, 0, 2);
+    if (strike) ctx.fillRect(-w / 2 + 6, -3, w - 12, 6);
+    ctx.restore();
+  };
+  stamp(d.stamp, "#c4233b", R - 118, rankTop + 50, -12, .4, 52, true);
+  stamp("BOZULDU", "#1f5fbf", R - 122, rankTop + 138, 7, .95, 52, false);
+  ctx.fillStyle = INK; ctx.font = "34px " + SYS;
+  for (const l of wrapLines(ctx, d.line, IW)) { ctx.fillText(l, L, y); y += 46; }
+  y += 8; ctx.fillStyle = SOFT; ctx.font = "30px " + SYS;
+  ctx.fillText(d.total, L, y);
+  const paperEnd = y + 48;
+
+  y = paperEnd + 44;
+  ctx.font = "36px " + SYS;
+  const momLines = wrapLines(ctx, d.mom, 840);
+  const boxH = 88 + momLines.length * 48 + 16;
+  ctx.fillStyle = "#262629";
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(70, y, 900, boxH, 30); else ctx.rect(70, y, 900, boxH);
+  ctx.fill();
+  ctx.fillStyle = "#ffd279"; ctx.font = "700 30px " + SYS;
+  ctx.fillText("👩 Annem", 100, y + 52);
+  ctx.fillStyle = "#f2f2f4"; ctx.font = "36px " + SYS;
+  let my = y + 104;
+  for (const l of momLines) { ctx.fillText(l, 100, my); my += 48; }
+  y += boxH + 66;
+  ctx.fillStyle = "#a3a3ab"; ctx.font = "30px " + SYS; ctx.textAlign = "center";
+  ctx.fillText("elnidal.github.io/kardes-zorbalama", W / 2, y);
+  ctx.textAlign = "left";
+  return { paperEnd, total: y + 50 };
+}
+async function buildImage(d, run) {
+  S.blob = null;
+  const btn = $("shareImg");
+  btn.disabled = true;
+  btn.textContent = "🖼️ Karar görseli hazırlanıyor…";
+  try {
+    await Promise.race([document.fonts.load('800 60px "Baloo 2"'), sleep(1500)]);
+  } catch (e) {}
+  if (run !== S.run) return;
+  const scratch = document.createElement("canvas");
+  scratch.width = 1080; scratch.height = 2400;
+  const size = paintVerdict(scratch.getContext("2d"), d, 2400, 2000);
+  const c = document.createElement("canvas");
+  c.width = 1080; c.height = size.total;
+  paintVerdict(c.getContext("2d"), d, size.total, size.paperEnd);
+  c.toBlob(blob => {
+    if (run !== S.run || !blob) return;
+    S.blob = blob;
+    S.file = new File([blob], "kardes-mahkemesi.png", { type: "image/png" });
+    let canShare = false;
+    try { canShare = !!(navigator.canShare && navigator.canShare({ files: [S.file] })); } catch (e) {}
+    S.canShare = canShare;
+    btn.disabled = false;
+    btn.textContent = canShare ? "🖼️ Karar görselini paylaş" : "🖼️ Karar görselini indir";
+  }, "image/png");
+}
+function downloadImage() {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(S.blob);
+  a.download = "kardes-mahkemesi.png";
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  $("shareImg").textContent = "✅ Görsel indirildi";
+}
+
 function showVerdict() {
+  const run = S.run;
   const p = pct();
   const [title, line] = tier(p);
   const key = "kz-best-" + S.mode;
@@ -550,12 +843,31 @@ function showVerdict() {
   $("total").textContent = S.score + " puan · Zorba-metre %" + p + " · En iyi: " + best;
   $("stamp").textContent = p < 20 ? "BERAAT" : "SUÇLU";
   const url = location.protocol.startsWith("http") ? " " + location.origin + location.pathname : "";
-  const text = "Kardeş Zorbalama'da " + S.score + " puan aldım. Kardeş Mahkemesi'nin kararı: " + title + ". Kutunun kapağını açmış mıydın? 😈" + url;
+  const momText = momRulingText(p);
+  $("momRulingText").textContent = momText;
+  $("momRuling").hidden = true;
+  $("momStamp").hidden = true;
+  $("stamp").classList.remove("overruled");
+  buildImage({
+    docket: $("docket").textContent, plaintiff: $("plaintiff").textContent, accused: $("accused").textContent,
+    rows, title, line, total: $("total").textContent, stamp: $("stamp").textContent, mom: momText
+  }, run);
+  const text = "Kardeş Zorbalama'da " + S.score + " puan aldım. Kardeş Mahkemesi'nin kararı: " + title + ". Annem kararı bozdu. Kutunun kapağını açmış mıydın? 😈" + url;
   $("shareText").textContent = text;
   $("wa").href = "https://wa.me/?text=" + encodeURIComponent(text);
   $("copy").textContent = "📋 Sonucu kopyala";
   show("verdict");
   $("verdict").scrollTop = 0;
+  sleep(350).then(() => { if (run === S.run) sfx.stamp(); });
+  sleep(1900).then(() => {
+    if (run !== S.run) return;
+    $("stamp").classList.add("overruled");
+    $("momStamp").hidden = false;
+    $("momRuling").hidden = false;
+    sfx.mom();
+    sleep(250).then(() => { if (run === S.run) sfx.stamp(); });
+    $("momRuling").scrollIntoView({ block: "nearest", behavior: "smooth" });
+  });
 }
 
 $("playAbi").addEventListener("click", () => play("abi"));
@@ -563,6 +875,22 @@ $("playRevenge").addEventListener("click", () => play("revenge"));
 $("again").addEventListener("click", () => play(S.mode));
 $("swap").addEventListener("click", () => play(S.mode === "abi" ? "revenge" : "abi"));
 for (const id of ["callVideo", "callVoice"]) $(id).addEventListener("click", () => add("chip", "📵 Bu hatta arama yok. Yazılı zorbalama geçerlidir."));
+$("soundBtn").addEventListener("click", () => {
+  soundOn = !soundOn;
+  store.set("kz-sound", soundOn ? "on" : "off");
+  renderSoundBtn();
+  ensureAudio();
+  sfx.incoming();
+});
+$("shareImg").addEventListener("click", async () => {
+  if (!S.blob) return;
+  if (S.canShare) {
+    try { await navigator.share({ files: [S.file] }); return; }
+    catch (e) { if (e.name === "AbortError") return; }
+  }
+  downloadImage();
+});
+renderSoundBtn();
 $("quit").addEventListener("click", () => { S.run++; clearInterval(timer); show("start"); });
 $("copy").addEventListener("click", async () => {
   try {
