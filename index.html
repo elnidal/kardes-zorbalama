@@ -28,6 +28,9 @@
   --incoming: #262629;
   --outgoing: #005c4b;
   --outgoing-line: #0f7a65;
+  --quote: #e3a47a;
+  --quote-bg: #1a1a1c;
+  --sis2: #ff8fb1;
   --green: #25d366;
   --on-green: #06281a;
   --tick: #53bdeb;
@@ -72,6 +75,7 @@ button { cursor: pointer; }
 .msg.tail.out::before { right: -6px; border-left: 7px solid var(--outgoing); }
 .meta { float: right; margin: 6px 0 -2px 10px; font-size: 11px; line-height: 1.2; color: var(--muted); font-variant-numeric: tabular-nums; }
 .msg.out .meta { color: var(--bubble-meta); }
+.msg.out .quote { background: #024a3d; }
 .ticks { letter-spacing: -3px; padding-right: 3px; font-weight: 700; }
 .ticks.read { color: var(--tick); }
 .msg.reacted { margin-bottom: 16px; }
@@ -106,7 +110,8 @@ h1 span { display: block; color: var(--green); }
 .mode:active, .reply:active { transform: scale(.985); }
 
 /* Chat screen */
-#game { display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; }
+#game { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto minmax(0, 1fr) auto; }
+#game > * { min-width: 0; }
 .head { display: flex; align-items: center; gap: 9px; padding-block: 9px; background: var(--bar); }
 .back { flex: none; display: grid; place-items: center; width: 34px; height: 40px; border: 0; padding: 0; background: none; color: var(--tick); }
 .back svg, .call svg { display: block; }
@@ -133,13 +138,31 @@ h1 span { display: block; color: var(--green); }
 .typing i:nth-child(2) { animation-delay: .15s; }
 .typing i:nth-child(3) { animation-delay: .3s; }
 #tray { padding-block: 8px 12px; display: flex; flex-direction: column; gap: 7px; background: var(--bar); border-top: 1px solid var(--bar-line); }
-.composer { display: flex; align-items: center; gap: 10px; color: var(--tick); }
-.plus { flex: none; font-size: 22px; line-height: 1; }
-.fake-input { flex: 1; min-width: 0; padding: 7px 14px; font-size: 15px; border-radius: 18px; background: var(--incoming); color: var(--muted); }
-.timer { height: 4px; border-radius: 2px; background: var(--bar-line); overflow: hidden; }
-.timer i { display: block; height: 100%; background: var(--hot); transform-origin: left; }
-.tray-label { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; font-weight: 600; color: var(--muted); margin: 0; font-variant-numeric: tabular-nums; }
-.tray-label b { color: var(--hot); }
+.tray-label { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 13px; font-weight: 600; color: var(--muted); margin: 0; }
+.seen { flex: none; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--bar-line); background: none; color: var(--muted); font-size: 12.5px; font-weight: 600; }
+#opts { display: flex; flex-direction: column; gap: 7px; }
+#opts:empty { display: none; }
+.emoji-row { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; }
+.emoji-row button { flex: none; width: 40px; height: 40px; border: 0; border-radius: 10px; background: none; font-size: 23px; line-height: 1; }
+.emoji-row button:hover { background: var(--incoming); }
+#composer { display: flex; align-items: center; gap: 8px; }
+#msgInput { flex: 1; min-width: 0; padding: 9px 15px; font-size: 16px; border-radius: 20px; border: 1px solid var(--bar-line); background: var(--incoming); color: var(--text); }
+#msgInput::placeholder { color: var(--muted); }
+.round-btn { flex: none; width: 38px; height: 38px; border-radius: 50%; border: 0; padding: 0; display: grid; place-items: center; font-size: 20px; line-height: 1; background: none; color: var(--tick); }
+#sendBtn { background: var(--green); color: var(--on-green); font-size: 17px; }
+#composer button:disabled, #msgInput:disabled { opacity: .45; cursor: default; }
+.quote { display: block; margin: 1px 0 5px; padding: 5px 9px; border-left: 4px solid var(--quote); border-radius: 7px; background: var(--quote-bg); font-size: 13.5px; color: var(--muted); }
+.quote b { display: block; color: var(--quote); font-size: 13px; }
+.quote span { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.fwd { display: block; font-size: 12px; font-style: italic; color: var(--muted); margin-bottom: 2px; }
+.msg.deleted { font-style: italic; color: var(--muted); }
+.sender.sis2 { color: var(--sis2); }
+.voice .sender { grid-column: 1 / -1; }
+.msg.in .reaction { left: auto; right: 10px; }
+.msg.in { cursor: pointer; }
+.react-picker { align-self: flex-start; display: flex; gap: 2px; padding: 4px 6px; margin-top: -2px; border-radius: 22px; background: var(--bar); border: 1px solid var(--bar-line); animation: pop .15s ease-out; }
+.react-picker button { width: 36px; height: 36px; border: 0; border-radius: 50%; background: none; font-size: 21px; line-height: 1; }
+.react-picker button:hover { background: var(--incoming); }
 .reply { align-self: flex-end; max-width: 92%; text-align: left; padding: 10px 14px; border-radius: 15px; border-bottom-right-radius: 4px; line-height: 1.3; background: var(--outgoing); color: var(--text); border: 1px solid var(--outgoing-line); }
 .reply:hover { border-color: var(--green); }
 
@@ -180,7 +203,7 @@ h1 span { display: block; color: var(--green); }
   <div>
     <p class="eyebrow">Abi Destek Hattı 📞</p>
     <h1>Kardeş <span>Zorbalama 😈</span></h1>
-    <p class="pitch">Kardeşin dert anlatır. Sen ilk aklına gelen en bariz soruyu en hızlı şekilde sorarsın. Yardım edersen puan kaybedersin.</p>
+    <p class="pitch">Kardeşin dert anlatır. Sen ilk aklına gelen en bariz soruyu sorarsın, istersen kendin yazarsın. Yardım edersen puan kaybedersin.</p>
   </div>
   <div class="demo" aria-label="Örnek konuşma">
     <div class="msg in tail">Hadi dinlen kahveni iç ve beni zorbalamaya başla ☕<span class="meta">18:58</span></div>
@@ -190,6 +213,10 @@ h1 span { display: block; color: var(--green); }
   <div class="field">
     <label for="nameInput">Kardeşin adı</label>
     <input id="nameInput" type="text" maxlength="16" placeholder="Örn. Ayşe" autocomplete="off">
+  </div>
+  <div class="field">
+    <label for="name2Input">Diğer kardeşin adı <span style="font-weight:400;color:var(--muted)">(isteğe bağlı, araya girer)</span></label>
+    <input id="name2Input" type="text" maxlength="16" placeholder="Örn. Zeynep" autocomplete="off">
   </div>
   <div class="modes">
     <button class="mode primary" id="playAbi" type="button"><b>😈 Abi ol, zorbala</b><small>Kardeşinin dertlerine bariz sorularla yetiş.</small></button>
@@ -213,7 +240,16 @@ h1 span { display: block; color: var(--green); }
     <div class="metre-track"><div class="metre-fill" id="fill"></div></div>
   </div>
   <div id="chat" class="gutter" aria-live="polite"></div>
-  <div id="tray" class="gutter"></div>
+  <div id="tray" class="gutter">
+    <div class="tray-label" id="askHead" hidden><span id="askLabel"></span><button class="seen" id="seenBtn" type="button">👀 Görüldü bırak</button></div>
+    <div id="opts"></div>
+    <div class="emoji-row" id="emojiRow" hidden></div>
+    <form id="composer" autocomplete="off">
+      <button class="round-btn" id="emojiBtn" type="button" aria-label="Emojiler" disabled>😊</button>
+      <input id="msgInput" type="text" maxlength="300" placeholder="Karşı taraf yazıyor…" aria-label="Kendi cevabın" enterkeyhint="send" disabled>
+      <button class="round-btn" id="sendBtn" type="submit" aria-label="Gönder" disabled>➤</button>
+    </form>
+  </div>
 </section>
 
 <section id="verdict" class="screen" hidden>
@@ -243,16 +279,24 @@ h1 span { display: block; color: var(--green); }
 </section>
 
 <script>
+// ---------- Content ----------
+// A reaction ("rb", "ro", "ry", "tw") is either one message, or a list of steps:
+// "text" (from the chat contact), { from: "mom" | "sis2", text }, { chip, cls }, { voice, from }, { deleted: true }.
 const ABI_REQUIRED = [
   { m: "Abicim yazıcıyı aldık ama bluetooth'la bir türlü bağlanamadım 😩",
-    b: "Bluetooth'u açmış mıydın {ad}?", o: "Yazıcı fişte mi {ad}?", y: "Eşleşmeyi silip yeniden dene. Olmazsa modelini at, bakayım.",
-    rb: "ABİ. Bluetooth'un ne olduğunu biliyorum yani. 😤", tw: ["bi dakika", "açık değilmiş. kimseye söyleme 🤫"] },
+    b: "Bluetooth'u açmış mıydın {ad}?", o: "Wifi var mı acaba yazıcıda? Var diye biliyorum", y: "Eşleşmeyi silip yeniden dene. Olmazsa modelini at, bakayım.",
+    rb: ["Bu kaçıncı seviye adam zorbalamaktır ama ya 😳😂😂😂", "Bluetooth bağlantısı kuramadım diyorum, bluetooth açık mıydı diyorsun. Akıl yaşımın 2 olduğunu düşündürme abi yapmaaaa 😂😂😂"],
+    ro: "Var var 🙂", tw: ["bi dakika", "açık değilmiş. kimseye söyleme 🤫"] },
   { m: "Abi araba çalışmıyor, yolda kaldım 😭",
     b: "Benzin koymuş muydun {ad}?", o: "Anahtarı çevirdin mi {ad}?", y: "Marş sesi geliyor mu? Akü olabilir, yol yardımını arayalım.",
     rb: "Arabanın benzinle çalıştığını biliyorum abi, sağ ol. 🙄", tw: ["gösterge niye kırmızı yanıyor ki", "tamam abi. benzin bitmiş. 🫣"] },
   { m: "Bilgisayarım çalışmıyor, yarın da teslimim var 😰",
     b: "Şarjı var mıydı {ad}?", o: "Kapağını açtın mı {ad}?", y: "Güç tuşuna 30 saniye basılı tut, sonra adaptörle aç.",
-    rb: "Yarın teslimim var diyorum, sen şarj diyorsun. 🤦‍♀️", tw: ["adaptör prize takılı değilmiş", "bunu duymadın 🤐"] }
+    rb: "Yarın teslimim var diyorum, sen şarj diyorsun. 🤦‍♀️", tw: ["adaptör prize takılı değilmiş", "bunu duymadın 🤐"] },
+  { starter: "🔋 Arabanın aküsü bitti. Yeni akü 18 kilo ve bagaja taşınması lazım.", prompt: "🔋 Aküyü kime taşıtacaksın?",
+    b: "{ad} şu aküyü bagaja taşır mısın? 🔋", o: "{ad} beraber taşıyalım, sen önden tut", y: "Ben taşırım {ad}, sen kapıyı aç yeter",
+    rb: ["YOK ARTIK 😳", "Abi o akü benden ağır 😂", { from: "sis2", text: "Bana da taşıtmaya çalışmıştı. Ben de yok artık demiştim 😂" }, { chip: "👭 Kardeşler birleşti", cls: "notice" }],
+    ro: "Önden tutan ben olunca bütün yük bende oluyor abi 😤", ry: "Abi iyi misin? Ateşin var mı? 🤒" }
 ];
 const ABI_POOL = [
   { m: "İnternet yok abi, hiçbir şey açılmıyor 😫",
@@ -266,7 +310,7 @@ const ABI_POOL = [
     rb: "Ben sana bir daha tarif sormayacağım. 😒", tw: ["fırın açıkmış ama", "sadece lambası. neyse."] },
   { m: "Telefonum çalmıyor, bütün aramaları kaçırıyorum 📵",
     b: "Sessizde olmasın {ad}?", o: "Seni arayan biri var mıydı {ad}?", y: "Odaklanma modunu ve engellenen numaraları kontrol et.",
-    rb: "O kadar da aptal değilim abi. 😠", tw: ["bi bakayım", "ses kapalıymış. bu aramayı unutalım."] },
+    rb: "O kadar da aptal değilim abi. 😠", ro: ["Abi. 😐", { from: "sis2", text: "Ben aradım, açmadı 😂" }], tw: ["bi bakayım", "ses kapalıymış. bu aramayı unutalım."] },
   { m: "Çamaşır makinesi çalışmıyor abi, su da almıyor 🧺",
     b: "Fişi takılı mı {ad}?", o: "İçine çamaşır koydun mu {ad}?", y: "Musluğu ve kapak kilidini kontrol et, hata kodu varsa at.",
     rb: "Abi fişin ne olduğunu 1998'den beri biliyorum. 🔌", tw: ["fiş takılı", "ama priz anahtarı kapalıymış"] },
@@ -275,14 +319,40 @@ const ABI_POOL = [
     rb: "Doğru şifreyi yazmak aklıma hiç gelmedi abi, teşekkürler. 👏", tw: ["Caps Lock", "KONUŞMAYALIM. 🙈"] },
   { m: "Kulaklıktan ses gelmiyor abi, yeni aldım 🎧",
     b: "Kulağına takmış mıydın {ad}?", o: "Sesi açtın mı {ad}?", y: "Telefonun ses çıkışını kulaklığa al, eşleşmeyi yenile.",
-    rb: "Abi ben bunu ailemize anlatacağım. 📢", tw: ["ses en kısıktaymış", "şikâyetimi geri çekiyorum"] }
+    rb: "Abi ben bunu ailemize anlatacağım. 📢", tw: ["ses en kısıktaymış", "şikâyetimi geri çekiyorum"] },
+  { m: "Telefonum dolmuş abi, fotoğraf çekemiyorum 📱",
+    b: "Fotoğraf silmeyi denedin mi {ad}?", o: "Telefon yanında mı {ad}?", y: "Fotoğrafları buluta yedekle, WhatsApp medyasını temizle.",
+    rb: "Abi 14 bin fotoğrafın hepsi anı 😤", tw: ["bi baktım", "aynı selfieden 47 tane varmış 🙈"] },
+  { m: "Klima soğutmuyor abi, eriyorum 🥵",
+    b: "Isıtma modunda olmasın {ad}?", o: "Kumandayı klimaya doğru tuttun mu {ad}?", y: "Filtresini temizle, 24 dereceye ayarla.",
+    rb: "Yazın ortasında ısıtma mı açacağım abi? 🙄", tw: ["kumandada güneş işareti var", "o yüzden mi bu kadar sıcak 🫠"] },
+  { m: "Dizim açılmıyor abi, tam en heyecanlı yerde kaldı 📺",
+    b: "İnternet var mı {ad}?", o: "Televizyon açık mı {ad}?", y: "Uygulamadan çıkış yapıp tekrar gir.",
+    rb: "Var abi var, sana mesajı neyle atıyorum? 🙄", tw: ["dur", "üyeliği ödemeyi unutmuşum 🫣"] },
+  { m: "Bulaşık makinesi bulaşıkları yıkamamış abi 🍽️",
+    b: "Tableti koymuş muydun {ad}?", o: "Bulaşıkları içine koymuş muydun {ad}?", y: "Filtresini temizle, kollarının döndüğünü kontrol et.",
+    rb: "Tablet koymayı bilmiyor muyum sence? 😠", tw: ["tablet hâlâ elimde duruyormuş", "🫠"] }
+];
+const ABI_VOICE = [
+  { voice: "0:47", b: "Fişi takılı mıydı {ad}?", o: "Kapatıp açtın mı {ad}?", y: "Dur, baştan anlat {ad}, dinliyorum.",
+    rb: "Abi 47 saniye annemin doğum gününü anlattım. Ne fişi? 🎂", ro: "Neyi kapatıp açayım abi? Annemin doğum günü diyorum. 🎂", ry: "Yine dinlemedin, değil mi? 😑" },
+  { voice: "1:32", b: "Şarjı var mıydı {ad}?", o: "Jelatinini çıkardın mı {ad}?", y: "Sesli dinleyemiyorum, yazsana {ad}.",
+    rb: "Bir buçuk dakika iş yerindeki kavgayı anlattım. Ne şarjı abi? 😤", ro: "Kavgadan bahsediyorum abi. Ne jelatini? 😤", ry: "Bir buçuk dakika boşuna konuştum yani. 🙃" },
+  { voice: "0:58", b: "Bluetooth'u açmış mıydın {ad}?", o: "Benzin koymuş muydun {ad}?", y: "Az sonra dinleyeceğim {ad}, söz.",
+    rb: "Abi tatil planı yapıyoruz. Bluetooth nereden çıktı? 🏖️", ro: "Otobüsle gidiyoruz abi tatile, benzin bende değil. 🚌", ry: "Bunu geçen ay da dedin. 🙄" }
 ];
 const ABI_FINAL = {
   m: "Uydu alıcısını aldım ama kuramadım. Hadi dinlen kahveni iç ve beni zorbalamaya başla ☕",
   b: "Kutunun kapağını açmış mıydın {ad}?", o: "Jelatini çıkarmış mıydın {ad}?", y: "HDMI'yı tak, kanal aramasını başlat, takıldığın yerde ara.",
-  rb: "Bu mesajları bir gün mahkemede kullanacağım. ⚖️😂", final: true
+  rb: ["Hahah", "Bu mesajları bir gün mahkemede kullanacağım. ⚖️😂"], final: true
 };
 
+const REV_REQUIRED = [
+  { m: "Arabanın aküsü bitti, takviye lazım 🔋",
+    b: "Aküyü kendin taşısana abi? 🔋", o: "Farları açık mı unuttun abi?", y: "Takviye kablosunu getiriyorum abi.",
+    rb: ["Tamam anladım, akü meselesini unutmadın 😅", { from: "sis2", text: "Unutmadık abi. YOK ARTIK 🔋😂" }],
+    ro: "Farlar kapalı. Sanırım. 🤔", ry: "Sağ ol. Bunu kimseye söyleme, imajım bozulur. 🤫" }
+];
 const REV_POOL = [
   { m: "Kod çalışmıyor, üç saattir uğraşıyorum 😤",
     b: "Bilgisayarı açmış mıydın abi?", o: "Kapatıp açtın mı abi?", y: "Hata mesajını oku, son değişikliği geri al abi.",
@@ -307,26 +377,13 @@ const REV_POOL = [
     rb: "Söylediğim şeye gel, çay içemiyorum diyorum.", tw: ["düğmesine basmamışım", "çay için teşekkürler"] },
   { m: "Telefonun şarjı dolmuyor 🔋",
     b: "Prize takmış mıydın abi?", o: "Şarj aleti sende mi abi?", y: "Kabloyu değiştir, girişin tozunu temizle abi.",
-    rb: "İntikam alıyorsun, anladım.", tw: ["prizin anahtarı kapalıymış", "sus 🤐"] }
-];
-const REV_FINAL = {
-  m: "Yazıcı aldım, bluetooth'la bağlanamadım. Sen bu işlerden anlarsın, bir bak 🖨️",
-  b: "Bluetooth'u açmış mıydın abi?", o: "Kutunun kapağını açmış mıydın abi?", y: "Eşleşmeyi silip yeniden dene abi.",
-  rb: "Tamam anladım. Mesaj alındı.", final: true
-};
-
-const REACT_MID = ["Abi bak gerçekten sinirleniyorum. 😡", "Beni kaç yaşında sanıyorsun? 😑", "Bunu bana annem bile sormadı. 🙄", "Bir de bunun için kahve molası verdin. ☕😒", "Bu soruyu sorarken yüzün gülüyor, görüyorum. 👀"];
-const REACT_MID_REV = ["Sen nereden öğrendin bu tavrı?", "Komik. Çok komik. 😐", "Bunu benden öğrendin, değil mi?", "Annemi arıyorum. 📞"];
-const REACT_HELP = ["Aa, işe yaradı. Sen iyi misin? 🥹", "Teşekkürler. Hasta mısın? 🤒", "Bu kadar nazik olman beni korkuttu. 😳", "Bir şey mi istiyorsun? 🤨"];
-const REACT_LATE = ["Görüldü atma, tikleri görüyorum. 👀", "Mesajı okudun, biliyorum.", "Cevap vermemek de zorbalıktır. 😤"];
-
-const ABI_VOICE = [
-  { voice: "0:47", b: "Fişi takılı mıydı {ad}?", o: "Kapatıp açtın mı {ad}?", y: "Dur, baştan anlat {ad}, dinliyorum.",
-    rb: "Abi 47 saniye annemin doğum gününü anlattım. Ne fişi? 🎂", ro: "Neyi kapatıp açayım abi? Annemin doğum günü diyorum. 🎂", ry: "Yine dinlemedin, değil mi? 😑" },
-  { voice: "1:32", b: "Şarjı var mıydı {ad}?", o: "Jelatinini çıkardın mı {ad}?", y: "Sesli dinleyemiyorum, yazsana {ad}.",
-    rb: "Bir buçuk dakika iş yerindeki kavgayı anlattım. Ne şarjı abi? 😤", ro: "Kavgadan bahsediyorum abi. Ne jelatini? 😤", ry: "Bir buçuk dakika boşuna konuştum yani. 🙃" },
-  { voice: "0:58", b: "Bluetooth'u açmış mıydın {ad}?", o: "Benzin koymuş muydun {ad}?", y: "Az sonra dinleyeceğim {ad}, söz.",
-    rb: "Abi tatil planı yapıyoruz. Bluetooth nereden çıktı? 🏖️", ro: "Otobüsle gidiyoruz abi tatile, benzin bende değil. 🚌", ry: "Bunu geçen ay da dedin. 🙄" }
+    rb: "İntikam alıyorsun, anladım.", tw: ["prizin anahtarı kapalıymış", "sus 🤐"] },
+  { m: "Üç aydır spora gidiyorum, bir gram vermedim 🏋️",
+    b: "Salona girmiş miydin abi?", o: "Üyeliği kullanıyor musun abi?", y: "Beslenmene de bak abi, sadece spor yetmez.",
+    rb: "Hazırlıklı geldin, belli. 😑", tw: ["giriş kartıma baktım", "en son ocakta girmişim 🫣"] },
+  { m: "Navigasyon beni yanlış yere götürdü 🗺️",
+    b: "Konumu açmış mıydın abi?", o: "Doğru adresi yazdın mı abi?", y: "Haritayı güncelle, adresi yeniden seç abi.",
+    rb: "Konum açık. Bu kadar da değil. 😤", tw: ["adrese bir baktım", "başka şehirdeki aynı isimli sokağı seçmişim 🙈"] }
 ];
 const REV_VOICE = [
   { voice: "0:58", b: "Fişi takılı mıydı abi?", o: "Kapatıp açtın mı abi?", y: "Dur, baştan anlat abi, dinliyorum.",
@@ -334,22 +391,79 @@ const REV_VOICE = [
   { voice: "1:14", b: "Şarjı var mıydı abi?", o: "Jelatinini çıkardın mı abi?", y: "Yaz abi, dinleyemiyorum.",
     rb: "Bir dakika ev sahibini anlattım. Ne şarjı? 😤", ro: "Ev sahibinin jelatini mi olur? 🙄", ry: "Sesli mesaj atan herkesi anlıyorum şimdi. 🥲" }
 ];
+const REV_FINAL = {
+  m: "Yazıcı aldım, bluetooth'la bağlanamadım. Sen bu işlerden anlarsın, bir bak 🖨️",
+  b: "Bluetooth'u açmış mıydın abi?", o: "Kutunun kapağını açmış mıydın abi?", y: "Eşleşmeyi silip yeniden dene abi.",
+  rb: ["Tamam anladım. Mesaj alındı. 😶", { from: "sis2", text: "Hahah 😂😂😂" }], final: true
+};
+
+const REACT_MID = ["Abi bak gerçekten sinirleniyorum. 😡", "Beni kaç yaşında sanıyorsun? 😑", "Bunu bana annem bile sormadı. 🙄", "Bir de bunun için kahve molası verdin. ☕😒", "Bu soruyu sorarken yüzün gülüyor, görüyorum. 👀"];
+const REACT_MID_REV = ["Sen nereden öğrendin bu tavrı?", "Komik. Çok komik. 😐", "Bunu benden öğrendin, değil mi?", "Annemi arıyorum. 📞"];
+const REACT_HELP = ["Aa, işe yaradı. Sen iyi misin? 🥹", "Teşekkürler. Hasta mısın? 🤒", "Bu kadar nazik olman beni korkuttu. 😳", "Bir şey mi istiyorsun? 🤨"];
+const REACT_LATE = ["Görüldü atma, tikleri görüyorum. 👀", "Mesajı okudun, biliyorum.", "Cevap vermemek de zorbalıktır. 😤"];
+const REACT_CUSTOM = {
+  abi: {
+    cb: ["Bu kaçıncı seviye adam zorbalamaktır ama ya 😳😂😂😂", "Kendi kafandan mı uydurdun bunu? 😂", "Abi bu soruyu hazırda mı tutuyordun? 😤", "Yapma abi yapmaaaa 😂😂"],
+    co: REACT_MID,
+    cf: ["Abi ne diyorsun anlamadım 😂", "Tamam abi, not aldım 📝", "Bunu da mahkemeye ekliyorum ⚖️", "Konuyu değiştirme 😤"],
+    emoji: ["Emojiyle mi geçiştiriyorsun? 😑", "Bu emoji ne demek şimdi? 🤨", "Cevap ver, emoji atma 😤"]
+  },
+  revenge: {
+    cb: ["Bunu benden öğrendin, biliyorum 😳", "Bu soruyu hak etmedim 😂", "Ben böyle sormuyordum ama 🙄", "Akıl yaşımın 2 olduğunu düşündürme 😂"],
+    co: REACT_MID_REV,
+    cf: ["Ne diyorsun anlamadım 😂", "Konuyu değiştirme 😤", "Tamam, not aldım 📝"],
+    emoji: ["Emojiyle mi geçiştiriyorsun? 😑", "Bu emoji ne demek şimdi? 🤨"]
+  }
+};
+const CUSTOM_POINTS = { cb: 120, co: 80, cf: 50, emoji: 40 };
+const CUSTOM_CHIP = { cb: "✍️ El yapımı bariz soru", co: "✍️ Kendi sorun", cf: "✍️ Serbest cevap", emoji: "🙂 Emojiyle geçiştirdin" };
+const CUSTOM_REACTION = { cb: ["😂", "🤬", "😳"], co: ["😒", "🙄"], cf: ["🤨", "😶"], emoji: ["😑", "🤨"] };
+const BARIZ_WORDS = /(aç|tak|koy|çıkar|bas|fiş|şarj|pil|bluetooth|wifi|wi-fi|kapa|jelatin|benzin|priz|sessiz|caps|kablo|kontrol|bakt|dene|güncelle|kapağ|düğme|elinde|cebin)/u;
+
 const MOM_EVENT = {
-  abi: { m: ["Kardeşine niye öyle diyorsun? 😠", "Oğlum yardım et şu kıza, ne soruyorsun öyle? 😠", "Telefonu kardeşin gösterdi. Ayıp değil mi? 😠"],
+  abi: { m: ["Kardeşine niye öyle diyorsun? 😠", "Oğlum yardım et şu kıza, ne soruyorsun öyle? 😠", "Telefonu kardeşin gösterdi. Ayıp değil mi? 😠", "OĞLUM KARDEŞİNE FİŞ SORMA 😠"],
     b: "Ben sadece soru sordum anne 😇", o: "Önce o başlattı anne", y: "Haklısın anne, özür dilerim",
     rb: "Sorunu ben bilmez miyim senin? 😒", ro: "İkinize de yemek yok. 🍽️", ry: "Aferin oğlum. Madem pişmansın, çöpü de at. 🗑️" },
-  revenge: { m: ["Abine öyle deme, o senin abin. 😠", "Kızım abin şimdi ne yapsın fişi? 😠", "Abin ağlıyor burada, ne yazdın ona? 😠"],
+  revenge: { m: ["Abine öyle deme, o senin abin. 😠", "Kızım abin şimdi ne yapsın fişi? 😠", "Abin ağlıyor burada, ne yazdın ona? 😠", "KIZIM ABİNE AKÜ TAŞITMA 😠"],
     b: "Ben sadece soru sordum anne 😇", o: "Önce o başlattı anne", y: "Haklısın anne, özür dilerim",
     rb: "Bu soruları kimden öğrendiğini biliyorum. 😒", ro: "İkinize de yemek yok. 🍽️", ry: "Aferin kızım. Madem pişmansın, sofrayı da kur. 🍽️" },
-  late: "Anneni de mi görüldüye atıyorsun? 😱"
+  late: "Anneni de mi görüldüye atıyorsun? 😱",
+  custom: ["Annene böyle mi yazılır? 😠", "Bana da mı bariz soru soruyorsun? 😱", "Bunu babana söyleyeceğim. 📞"],
+  emoji: ["Bu sarı surat ne demek? 🤔", "Emoji atma, düzgün yaz. 👓"]
 };
+const JOIN_MOM = { chip: "👩 Annem gruba katıldı", cls: "notice" };
+const LEAVE_MOM = { chip: "👩 Annem gruptan ayrıldı", cls: "notice" };
+const JOIN_SIS = { chip: "👧 {ad2} gruba katıldı", cls: "notice" };
+const LEAVE_SIS = { chip: "👧 {ad2} gruptan ayrıldı", cls: "notice" };
+const EVENTS = {
+  abi: [
+    [JOIN_MOM, { from: "mom", fwd: true, text: "GÜNAYDIN 🌹🌹🌹 HAYIRLI AKŞAMLAR 🌹 BU MESAJI 10 KİŞİYE GÖNDERMEZSENİZ 🙏" }, "Anne yanlış gruba attın 😂", { from: "mom", text: "Bilerek attım. Gönderin. 🙏" }, LEAVE_MOM],
+    [JOIN_MOM, { from: "mom", voice: "3:12" }, "Anne 3 dakika ne anlattın 😳", { from: "mom", text: "Yemek yediniz mi diye sordum." }, LEAVE_MOM],
+    [JOIN_MOM, { from: "mom", text: "ÇOCUKLAR KAVGA ETMEYİN AKŞAM KÖFTE VAR 🍖" }, { from: "mom", text: "Abiniz de gelsin. Ama fişi sormasın." }, "Annem de biliyor yani 😂", LEAVE_MOM],
+    [JOIN_MOM, { from: "mom", text: "Kızım şu WhatsApp'ta yazıyı nasıl büyütüyorduk" }, "Anne bunu abime sor 😇", { from: "mom", text: "Abine sordum. 'Ayarlara baktın mı anne' dedi. 😒" }, "Hahah 😂 annemi de zorbalıyor", LEAVE_MOM],
+    [JOIN_SIS, { from: "sis2", text: "Abi bana da geçen hafta 'fişi taktın mı' dedi 😂" }, "Gördün mü? Mahkemede tanık olur musun? ⚖️", { from: "sis2", text: "Olurum. Akü olayını da anlatırım 🔋" }, LEAVE_SIS],
+    [{ deleted: true }, "Sana kızdım, yazdım, sildim. İyi akşamlar 😇"],
+    [{ chip: "📸 {ad} ekran görüntüsü aldı" }, "Delil toplanıyor ⚖️"]
+  ],
+  revenge: [
+    [JOIN_MOM, { from: "mom", fwd: true, text: "GÜNAYDIN 🌹🌹🌹 HAYIRLI AKŞAMLAR 🌹 BU MESAJI 10 KİŞİYE GÖNDERMEZSENİZ 🙏" }, "Anne yanlış gruba attın 😂", { from: "mom", text: "Bilerek attım. Gönderin. 🙏" }, LEAVE_MOM],
+    [JOIN_MOM, { from: "mom", voice: "3:12" }, "Anne 3 dakika ne anlattın 😳", { from: "mom", text: "Yemek yediniz mi diye sordum." }, LEAVE_MOM],
+    [JOIN_MOM, { from: "mom", text: "ÇOCUKLAR KAVGA ETMEYİN AKŞAM KÖFTE VAR 🍖" }, { from: "mom", text: "Abiniz de gelsin. Ama fişi sormasın." }, "Anne ben ne yaptım 😳", LEAVE_MOM],
+    [JOIN_SIS, { from: "sis2", text: "Abi bana da 'fişi taktın mı' demişti. İntikamımı al {ad} 😂" }, "İkiniz birleştiniz yani 😳", { from: "sis2", text: "Akü olayını unutmadık abi 🔋" }, LEAVE_SIS],
+    [{ deleted: true }, "Yanlış yere yazdım 😇"],
+    [{ chip: "📸 Abi ekran görüntüsü aldı" }, "Anneme gösteriyorum 😤"]
+  ]
+};
+
 const MOM_RULE = {
   abi: ["Bu kadar iyi davranıyorsan kesin bir şey istiyorsun. Beraat iptal.", "Kardeşine bir de böyle mi diyorsun? Karar iptal.", "Fişi sorma, git kardeşinin yanına. Karar iptal.", "Bu mahkemeyi ben kurmadım, o yüzden geçersiz. Yine de ayıp ettin.", "Mahkeme de kim oluyormuş? Bu evin hâkimi benim. Karar bozuldu."],
   revenge: ["Bu kadar melek olma, abin şımarıyor. Karar iptal.", "Abine biraz daha yüklenebilirdin. Karar iptal.", "Abine öyle deme. Ama fişi sormakla iyi yapmışsın. Karar iptal.", "Bu soruları nereden öğrendiğini biliyorum. Karar iptal.", "Mahkeme de kim oluyormuş? Bu evin hâkimi benim. Karar bozuldu."]
 };
-const MOM_PENALTY = ["Akşam çöpü sen atacaksın. 🗑️", "Bulaşık sende. 🍽️", "Ben sizin yaşınızdayken fişi kendim takardım. 🔌"];
+const MOM_PENALTY = ["Akşam çöpü sen atacaksın. 🗑️", "Bulaşık sende. 🍽️", "Ben sizin yaşınızdayken fişi kendim takardım. 🔌", "Aküyü de sen taşıyacaksın. 🔋"];
+const EMOJI_BAR = ["😂", "😈", "🙄", "😳", "🤦‍♂️", "🤔", "😇", "🫠", "👀", "🤫", "❤️", "🔌", "🔋", "📦"];
+const REACT_PICK = ["😂", "😳", "🙄", "❤️", "😈", "🤦‍♂️"];
 
-const ROUNDS = 7, TIME_LIMIT = 13000;
+const ROUNDS = 8, ROUND_MAX = 130;
 const $ = id => document.getElementById(id);
 const pick = a => a[Math.floor(Math.random() * a.length)];
 const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
@@ -359,9 +473,9 @@ const store = {
   set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
 };
 
-const S = { run: 0, mode: "abi", name: "", score: 0, n: {} };
-let timer = null;
+const S = { run: 0, mode: "abi", name: "", name2: "", score: 0, n: {}, answer: null };
 
+// ---------- Sound and vibration ----------
 let audio = null;
 let soundOn = store.get("kz-sound") !== "off";
 function ensureAudio() {
@@ -385,7 +499,7 @@ function buzz(pattern) { if (soundOn) { try { navigator.vibrate && navigator.vib
 const sfx = {
   incoming() { tone(740, .09); tone(990, .12, "sine", .1, .07); },
   sent() { tone(420, .13, "sine", .1, 0, 860); },
-  tick() { tone(1200, .04, "square", .04); },
+  pop() { tone(660, .07, "triangle", .1); },
   twist() { [523, 659, 784, 1047].forEach((f, i) => tone(f, .18, "triangle", .14, i * .09)); buzz([60, 40, 120]); },
   mom() { tone(196, .22, "sawtooth", .08); tone(165, .3, "sawtooth", .08, .2); buzz([120, 60, 120]); },
   stamp() { tone(110, .22, "square", .2, 0, 45); buzz(50); },
@@ -396,10 +510,12 @@ function renderSoundBtn() {
   $("soundBtn").setAttribute("aria-pressed", String(soundOn));
 }
 
+// ---------- Chat rendering ----------
 function show(id) { for (const s of ["start", "game", "verdict"]) $(s).hidden = s !== id; }
-const fill = t => t.replaceAll("{ad}", S.name);
+const fill = t => t.replaceAll("{ad2}", S.name2).replaceAll("{ad}", S.name);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const scrollDown = () => { const c = $("chat"); c.scrollTop = c.scrollHeight; };
+const senderName = from => from === "mom" ? "Annem" : from === "sis2" ? S.name2 : "";
 function add(cls, text) {
   const d = document.createElement("div");
   d.className = cls; d.textContent = text;
@@ -407,15 +523,33 @@ function add(cls, text) {
   return d;
 }
 const clock = () => new Date().toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
-function bubble(side, text, sender) {
+function newBubble(side, extra) {
   const prev = $("chat").lastElementChild;
   if (prev && prev.classList.contains(side)) prev.classList.remove("tail");
   const d = document.createElement("div");
-  d.className = "msg tail " + side;
-  if (sender) {
-    const n = document.createElement("span");
-    n.className = "sender"; n.textContent = sender;
-    d.append(n);
+  d.className = "msg tail " + side + (extra ? " " + extra : "");
+  return d;
+}
+function senderLabel(from) {
+  const n = document.createElement("span");
+  n.className = "sender " + from; n.textContent = senderName(from);
+  return n;
+}
+function bubble(side, text, o = {}) {
+  const d = newBubble(side, o.deleted ? "deleted" : "");
+  if (o.from) d.append(senderLabel(o.from));
+  if (o.fwd) {
+    const f = document.createElement("span");
+    f.className = "fwd"; f.textContent = "↪️ Çok kez iletildi";
+    d.append(f);
+  }
+  if (o.quote) {
+    const q = document.createElement("span");
+    q.className = "quote";
+    const who = document.createElement("b"); who.textContent = "Siz";
+    const qt = document.createElement("span"); qt.textContent = o.quote;
+    q.append(who, qt);
+    d.append(q);
   }
   d.append(text);
   const meta = document.createElement("span");
@@ -431,12 +565,10 @@ function bubble(side, text, sender) {
   if (side === "out") sfx.sent(); else sfx.incoming();
   return d;
 }
-function voiceBubble(duration) {
-  const prev = $("chat").lastElementChild;
-  if (prev && prev.classList.contains("in")) prev.classList.remove("tail");
-  const d = document.createElement("div");
-  d.className = "msg in tail voice";
+function voiceBubble(duration, from) {
+  const d = newBubble("in", "voice");
   d.setAttribute("aria-label", "Sesli mesaj, " + duration);
+  if (from) d.append(senderLabel(from));
   const play = document.createElement("button");
   play.type = "button"; play.className = "voice-play"; play.textContent = "▶"; play.setAttribute("aria-label", "Sesli mesajı oynat");
   const bars = document.createElement("div");
@@ -468,11 +600,12 @@ function react(el, emoji) {
   const t = el.querySelector(".ticks");
   if (t) { t.classList.add("read"); t.setAttribute("aria-label", "görüldü"); }
   if (!emoji) return;
-  const r = document.createElement("span");
-  r.className = "reaction"; r.textContent = emoji;
-  el.append(r); el.classList.add("reacted"); scrollDown();
+  let r = el.querySelector(".reaction");
+  if (!r) { r = document.createElement("span"); r.className = "reaction"; el.append(r); }
+  r.textContent = emoji;
+  el.classList.add("reacted"); scrollDown();
 }
-const pct = () => Math.min(100, Math.round(S.score / (ROUNDS * 150) * 100));
+const pct = () => Math.min(100, Math.round(S.score / (ROUNDS * ROUND_MAX) * 100));
 function moodStatus() {
   const p = pct();
   return p < 20 ? "çevrimiçi" : p < 45 ? "biraz gergin" : p < 70 ? "sinirli" : p < 90 ? "anneye şikâyet ediyor" : "seni engellemek üzere";
@@ -486,76 +619,180 @@ function updateMetre() {
   $("status").textContent = moodStatus();
 }
 
-async function incoming(text, run, sender) {
-  $("status").textContent = sender ? "Annem yazıyor…" : "yazıyor…";
-  const t = document.createElement("div");
-  t.className = "msg in tail typing";
+async function incoming(text, run, o = {}) {
+  $("status").textContent = o.from ? senderName(o.from) + " yazıyor…" : "yazıyor…";
+  const t = newBubble("in", "typing");
   t.setAttribute("aria-label", "yazıyor");
   t.innerHTML = "<i></i><i></i><i></i>";
   $("chat").append(t); scrollDown();
   await sleep(Math.min(1300, 450 + text.length * 11));
   t.remove();
   if (run !== S.run) return false;
-  bubble("in", text, sender);
+  bubble("in", text, o);
   $("status").textContent = moodStatus();
   return true;
 }
-async function incomingVoice(r, run) {
-  $("status").textContent = "ses kaydediyor…";
+async function incomingVoice(duration, run, from) {
+  $("status").textContent = from ? senderName(from) + " ses kaydediyor…" : "ses kaydediyor…";
   await sleep(1100);
   if (run !== S.run) return false;
-  voiceBubble(r.voice);
-  add("chip", "🎧 Dinlemeden cevap ver");
+  voiceBubble(duration, from);
   $("status").textContent = moodStatus();
   return true;
 }
-
-function composer() {
-  const c = document.createElement("div");
-  c.className = "composer"; c.setAttribute("aria-hidden", "true");
-  c.innerHTML = '<span class="plus">+</span><span class="fake-input">Cevap düşünülüyor…</span><span class="plus">🎤</span>';
-  $("tray").replaceChildren(c);
+// Plays one reaction or a list of steps; the first message quotes what the player sent.
+async function say(steps, run, quote) {
+  if (!Array.isArray(steps)) steps = [steps];
+  let first = true;
+  for (const st of steps) {
+    if (typeof st === "string") {
+      if (!await incoming(fill(st), run, { quote: first ? quote : "" })) return false;
+      first = false;
+    } else if (st.chip) {
+      add("chip" + (st.cls ? " " + st.cls : ""), fill(st.chip));
+      if (st.chip.startsWith("👩 Annem gruba")) sfx.mom(); else sfx.pop();
+      await sleep(600);
+      if (run !== S.run) return false;
+    } else if (st.voice) {
+      if (!await incomingVoice(st.voice, run, st.from)) return false;
+    } else if (st.deleted) {
+      if (!await incoming("…", run)) return false;
+      const last = $("chat").lastElementChild;
+      last.classList.add("deleted");
+      last.firstChild.textContent = "🚫 Bu mesaj silindi";
+    } else {
+      if (!await incoming(fill(st.text), run, { from: st.from, fwd: st.fwd, quote: first ? quote : "" })) return false;
+      first = false;
+    }
+  }
+  return true;
 }
 
+// ---------- Answering ----------
+function setComposer(on) {
+  $("msgInput").disabled = !on;
+  $("sendBtn").disabled = !on;
+  $("emojiBtn").disabled = !on;
+  $("msgInput").placeholder = on ? "Kendi cevabını yaz…" : "Karşı taraf yazıyor…";
+  if (!on) $("emojiRow").hidden = true;
+}
 function ask(round, prompt) {
   return new Promise(resolve => {
-    const tray = $("tray");
-    tray.replaceChildren();
-    const start = performance.now();
-    const done = kind => {
-      clearInterval(timer);
-      const left = Math.max(0, 1 - (performance.now() - start) / TIME_LIMIT);
-      composer();
-      resolve({ kind, left });
-    };
-    const label = document.createElement("p");
-    label.className = "tray-label";
-    const secs = document.createElement("b");
-    secs.textContent = Math.ceil(TIME_LIMIT / 1000) + " sn";
-    label.textContent = prompt || "⏱️ Çabuk, ilk aklına geleni sor";
-    const bar = document.createElement("div");
-    bar.className = "timer";
-    const barFill = document.createElement("i");
-    bar.append(barFill);
-    label.append(secs);
-    tray.append(label, bar);
+    $("askLabel").textContent = prompt || "Bir cevap seç ya da kendin yaz 👇";
+    $("askHead").hidden = false;
+    const opts = $("opts");
+    opts.replaceChildren();
     for (const kind of shuffle(["b", "o", "y"])) {
       const b = document.createElement("button");
       b.type = "button"; b.className = "reply"; b.textContent = fill(round[kind]);
-      b.addEventListener("click", () => done(kind));
-      tray.append(b);
+      b.addEventListener("click", () => S.answer && S.answer({ kind }));
+      opts.append(b);
     }
+    setComposer(true);
+    S.answer = ans => {
+      S.answer = null;
+      opts.replaceChildren();
+      $("askHead").hidden = true;
+      setComposer(false);
+      resolve(ans);
+    };
     scrollDown();
-    let lastSecs = Math.ceil(TIME_LIMIT / 1000);
-    timer = setInterval(() => {
-      const left = 1 - (performance.now() - start) / TIME_LIMIT;
-      barFill.style.transform = "scaleX(" + Math.max(0, left) + ")";
-      const nowSecs = Math.max(0, Math.ceil(left * TIME_LIMIT / 1000));
-      if (nowSecs !== lastSecs) { lastSecs = nowSecs; if (nowSecs > 0 && nowSecs <= 3) sfx.tick(); }
-      secs.textContent = nowSecs + " sn";
-      if (left <= 0) done("late");
-    }, 50);
   });
+}
+function classify(text) {
+  const t = text.toLocaleLowerCase("tr");
+  if (!/\p{L}/u.test(t)) return "emoji";
+  const q = t.includes("?") || /(^|\s)m[ıiuü](y?d[ıiuü]n?|s[ıiuü]n|y[ıiuü]m)?(?=\s|$|[?!.,])/u.test(t);
+  if (q && BARIZ_WORDS.test(t)) return "cb";
+  if (q) return "co";
+  return "cf";
+}
+
+async function resolveRound(r, ans, run, sureTwist) {
+  const mid = S.mode === "abi" ? REACT_MID : REACT_MID_REV;
+  if (ans.kind === "late") {
+    S.n.late++; S.score += 20; updateMetre();
+    add("chip", "👀 Görüldü bıraktın · +20");
+    return incoming(pick(REACT_LATE), run);
+  }
+  const text = ans.kind === "custom" ? ans.text : fill(r[ans.kind]);
+  const sent = bubble("out", text);
+  await sleep(350);
+  if (run !== S.run) return false;
+
+  if (ans.kind === "custom") {
+    const c = classify(text);
+    S.n.c++;
+    react(sent, pick(CUSTOM_REACTION[c]));
+    if (!await say(pick(REACT_CUSTOM[S.mode][c]), run, text)) return false;
+    S.score += CUSTOM_POINTS[c]; updateMetre();
+    add("chip good", CUSTOM_CHIP[c] + " · +" + CUSTOM_POINTS[c]);
+    return true;
+  }
+  if (ans.kind === "b") {
+    S.n.b++;
+    const twisted = r.tw && (r === sureTwist || Math.random() < 0.2);
+    if (twisted) {
+      react(sent);
+      if (!await say(r.tw, run, text)) return false;
+      react(sent, "🤫");
+      sfx.twist();
+      S.n.twist++; S.score += ROUND_MAX * 2; updateMetre();
+      add("chip twist", "🎯 HAKLI ÇIKTIN · ×2 · +" + ROUND_MAX * 2);
+    } else {
+      react(sent, pick(["😡", "🤬", "🙄", "🤦‍♀️", "😤"]));
+      if (!await say(r.rb, run, text)) return false;
+      S.score += ROUND_MAX; updateMetre();
+      add("chip good", "😈 En bariz soru · +" + ROUND_MAX);
+    }
+  } else if (ans.kind === "o") {
+    S.n.o++;
+    react(sent, pick(["😒", "🙄", "😑"]));
+    if (!await say(r.ro || pick(mid), run, text)) return false;
+    S.score += 70; updateMetre();
+    add("chip good", "😏 Fena bariz · +70");
+  } else {
+    S.n.y++;
+    react(sent, pick(["🥹", "😳", "❤️"]));
+    if (!await say(r.ry || pick(REACT_HELP), run, text)) return false;
+    add("chip", r.voice ? "🙃 Dinler gibi yaptın · +0" : "😇 Gerçekten yardım ettin · +0");
+  }
+  return true;
+}
+
+async function momEvent(run) {
+  const ev = MOM_EVENT[S.mode];
+  if (!await say([JOIN_MOM, { from: "mom", text: pick(ev.m) }], run)) return false;
+  const ans = await ask(ev, "👩 Anneye cevap ver");
+  if (run !== S.run) return false;
+  S.mom = ans.kind;
+  if (ans.kind === "late") {
+    S.score = Math.max(0, S.score - 20);
+    add("chip", "😱 Anneni görüldüye attın · −20");
+    if (!await incoming(MOM_EVENT.late, run, { from: "mom" })) return false;
+  } else {
+    const text = ans.kind === "custom" ? ans.text : ev[ans.kind];
+    const sent = bubble("out", text);
+    await sleep(350);
+    if (run !== S.run) return false;
+    let reply, delta;
+    if (ans.kind === "custom") {
+      S.n.c++;
+      const emojiOnly = classify(text) === "emoji";
+      reply = pick(emojiOnly ? MOM_EVENT.emoji : MOM_EVENT.custom);
+      delta = 40;
+    } else {
+      reply = ev["r" + ans.kind];
+      delta = ans.kind === "b" ? 50 : ans.kind === "o" ? 30 : -30;
+    }
+    react(sent, ans.kind === "y" ? "❤️" : "😒");
+    if (!await incoming(reply, run, { from: "mom", quote: text })) return false;
+    S.score = Math.max(0, S.score + delta);
+    add(delta > 0 ? "chip good" : "chip", delta > 0 ? "😈 Anneye kafa tuttun · +" + delta : "🙇 Anneye boyun eğdin · −" + -delta);
+  }
+  updateMetre();
+  await sleep(500);
+  return say([LEAVE_MOM], run);
 }
 
 function buildRounds() {
@@ -563,40 +800,8 @@ function buildRounds() {
     const extra = shuffle(ABI_POOL).slice(0, ROUNDS - 2 - ABI_REQUIRED.length);
     return [...shuffle([...ABI_REQUIRED, ...extra, pick(ABI_VOICE)]), ABI_FINAL];
   }
-  return [...shuffle([...shuffle(REV_POOL).slice(0, ROUNDS - 2), pick(REV_VOICE)]), REV_FINAL];
-}
-
-async function momEvent(run) {
-  const ev = MOM_EVENT[S.mode];
-  const joined = add("chip notice", "👩 Annem gruba katıldı");
-  joined.setAttribute("role", "status");
-  sfx.mom();
-  await sleep(700);
-  if (run !== S.run) return false;
-  if (!await incoming(pick(ev.m), run, "Annem")) return false;
-  const { kind } = await ask(ev, "👩 Anneye cevap ver, çabuk");
-  if (run !== S.run) return false;
-  S.mom = kind;
-  if (kind === "late") {
-    S.score = Math.max(0, S.score - 20);
-    add("chip", "😱 Anneni görüldüye attın · −20");
-    if (!await incoming(MOM_EVENT.late, run, "Annem")) return false;
-  } else {
-    const sent = bubble("out", ev[kind]);
-    await sleep(350);
-    if (run !== S.run) return false;
-    react(sent, kind === "y" ? "❤️" : "😒");
-    if (!await incoming(ev["r" + kind], run, "Annem")) return false;
-    const delta = kind === "b" ? 50 : kind === "o" ? 30 : -30;
-    S.score = Math.max(0, S.score + delta);
-    add(delta > 0 ? "chip good" : "chip", (delta > 0 ? "😈 Anneye kafa tuttun · +" + delta : "🙇 Anneye boyun eğdin · −" + -delta));
-  }
-  updateMetre();
-  await sleep(500);
-  if (run !== S.run) return false;
-  add("chip notice", "👩 Annem gruptan ayrıldı");
-  await sleep(600);
-  return run === S.run;
+  const extra = shuffle(REV_POOL).slice(0, ROUNDS - 2 - REV_REQUIRED.length);
+  return [...shuffle([...REV_REQUIRED, ...extra, pick(REV_VOICE)]), REV_FINAL];
 }
 
 async function play(mode) {
@@ -604,80 +809,53 @@ async function play(mode) {
   S.mode = mode;
   S.run++;
   const run = S.run;
-  clearInterval(timer);
+  S.answer = null;
   const typed = $("nameInput").value.trim();
+  const typed2 = $("name2Input").value.trim();
   store.set("kz-name", typed);
+  store.set("kz-name2", typed2);
   S.name = typed || "kardeşim";
+  S.name2 = typed2 ? trCap(typed2) : "Öbür kardeşim";
   S.score = 0;
-  S.n = { b: 0, o: 0, y: 0, late: 0, twist: 0 };
+  S.n = { b: 0, o: 0, y: 0, c: 0, late: 0, twist: 0 };
   S.mom = "";
   const contact = mode === "abi" ? (typed ? trCap(typed) : "Kardeşim") : "Abi";
   $("contact").textContent = contact;
   $("avatar").textContent = contact[0];
   $("chat").replaceChildren();
-  composer();
+  $("opts").replaceChildren();
+  $("askHead").hidden = true;
+  $("msgInput").value = "";
+  setComposer(false);
   add("chip day", "Bugün");
   add("chip notice", "🔒 Mesajlar uçtan uca zorbalanmaktadır. Bu sohbetten kimse kurtulamaz.");
+  add("chip", "💡 Gelen mesaja dokunup emoji bırakabilirsin");
   updateMetre();
   show("game");
 
   const rounds = buildRounds();
-  const twistEligible = rounds.filter(r => r.tw);
-  const sureTwist = pick(twistEligible);
-  const mid = mode === "abi" ? REACT_MID : REACT_MID_REV;
-  const momAfter = 1 + Math.floor(Math.random() * 4);
+  const sureTwist = pick(rounds.filter(r => r.tw));
+  // Three interruptions after random rounds: the mom always comes once, plus two other scenes.
+  const slots = shuffle([0, 1, 2, 3, 4, 5, 6].filter(i => i < rounds.length - 1)).slice(0, 3);
+  const scenes = shuffle(EVENTS[mode]).slice(0, 2).map(steps => run => say(steps, run));
+  const events = {};
+  shuffle([momEvent, ...scenes]).forEach((fn, k) => { events[slots[k]] = fn; });
 
   for (let i = 0; i < rounds.length; i++) {
     const r = rounds[i];
     $("roundNo").textContent = (i + 1) + " / " + rounds.length;
-    if (r.voice) { if (!await incomingVoice(r, run)) return; }
-    else if (!await incoming(r.m, run)) return;
-    const { kind, left } = await ask(r, r.voice ? "🎧 Dinlemeye vakit yok, cevap ver" : "");
+    if (r.starter) { add("chip notice", r.starter); sfx.pop(); await sleep(500); }
+    else if (r.voice) {
+      if (!await incomingVoice(r.voice, run)) return;
+      add("chip", "🎧 Dinlemeden cevap ver");
+    } else if (!await incoming(r.m, run)) return;
     if (run !== S.run) return;
-
-    if (kind === "late") {
-      S.n.late++; S.score += 20; updateMetre();
-      add("chip", "👀 Görüldü bıraktın · +20");
-      if (!await incoming(pick(REACT_LATE), run)) return;
-    } else {
-      const sent = bubble("out", fill(r[kind]));
-      await sleep(350);
-      if (run !== S.run) return;
-      if (kind === "b") {
-        S.n.b++;
-        const pts = 100 + Math.round(50 * left);
-        const twisted = r.tw && (r === sureTwist || Math.random() < 0.2);
-        if (twisted) {
-          react(sent);
-          if (!await incoming(r.tw[0], run)) return;
-          if (!await incoming(r.tw[1], run)) return;
-          react(sent, "🤫");
-          S.n.twist++; S.score += pts * 2; updateMetre();
-          sfx.twist();
-          add("chip twist", "🎯 HAKLI ÇIKTIN · ×2 · +" + (pts * 2));
-        } else {
-          react(sent, pick(["😡", "🤬", "🙄", "🤦‍♀️", "😤"]));
-          if (!await incoming(r.rb, run)) return;
-          S.score += pts; updateMetre();
-          add("chip good", "😈 En bariz soru · +" + pts);
-        }
-      } else if (kind === "o") {
-        S.n.o++;
-        const pts = 50 + Math.round(25 * left);
-        react(sent, pick(["😒", "🙄", "😑"]));
-        if (!await incoming(r.ro || pick(mid), run)) return;
-        S.score += pts; updateMetre();
-        add("chip good", "😏 Fena bariz · +" + pts);
-      } else {
-        S.n.y++;
-        react(sent, pick(["🥹", "😳", "❤️"]));
-        if (!await incoming(r.ry || pick(REACT_HELP), run)) return;
-        add("chip", r.voice ? "🙃 Dinler gibi yaptın · +0" : "😇 Gerçekten yardım ettin · +0");
-      }
-    }
+    const ans = await ask(r, r.prompt || (r.voice ? "🎧 Dinlemeye vakit yok, cevap ver" : ""));
+    if (run !== S.run) return;
+    if (!await resolveRound(r, ans, run, sureTwist)) return;
     await sleep(650);
     if (run !== S.run) return;
-    if (i === momAfter && !await momEvent(run)) return;
+    if (events[i] && !await events[i](run)) return;
   }
   add("chip", "⚖️ Mahkeme toplanıyor…");
   await sleep(1300);
@@ -685,6 +863,7 @@ async function play(mode) {
   showVerdict();
 }
 
+// ---------- Verdict ----------
 function tier(p) {
   if (S.mode === "abi") {
     if (p < 20) return ["😇 Örnek Abi", "Kardeşin sana teşekkür etti. Bu kadar yardım şüphe uyandırdı."];
@@ -699,7 +878,6 @@ function tier(p) {
   if (p < 90) return ["👑 Aile Şefi", "Abi seni aramaktan çekinmeye başladı."];
   return ["⚖️ Jelatin Adaleti Temsilcisi", "Yıllarca süren zorbalığın bedeli tek oyunda ödendi."];
 }
-
 function tierIndex(p) { return p < 20 ? 0 : p < 45 ? 1 : p < 70 ? 2 : p < 90 ? 3 : 4; }
 function momRulingText(p) {
   const rule = MOM_RULE[S.mode][tierIndex(p)];
@@ -832,7 +1010,7 @@ function showVerdict() {
   $("docket").textContent = "Dava no: 2026/" + (100 + Math.floor(Math.random() * 900));
   $("plaintiff").textContent = "Davacı: " + (S.mode === "abi" ? named : "Abi");
   $("accused").textContent = "Sanık: " + (S.mode === "abi" ? "Abi" : named);
-  const rows = [["En bariz soru", S.n.b], ["Fena bariz soru", S.n.o], ["Haklı çıkma", S.n.twist], ["Gerçek yardım", S.n.y], ["Görüldü bırakma", S.n.late]];
+  const rows = [["En bariz soru", S.n.b], ["Fena bariz soru", S.n.o], ["Kendi sözlerin", S.n.c], ["Haklı çıkma", S.n.twist], ["Gerçek yardım", S.n.y], ["Görüldü bırakma", S.n.late]];
   $("counts").replaceChildren(...rows.flatMap(([k, v]) => {
     const dt = document.createElement("dt"); dt.textContent = k;
     const dd = document.createElement("dd"); dd.textContent = v;
@@ -870,6 +1048,7 @@ function showVerdict() {
   });
 }
 
+// ---------- Controls ----------
 $("playAbi").addEventListener("click", () => play("abi"));
 $("playRevenge").addEventListener("click", () => play("revenge"));
 $("again").addEventListener("click", () => play(S.mode));
@@ -882,16 +1061,49 @@ $("soundBtn").addEventListener("click", () => {
   ensureAudio();
   sfx.incoming();
 });
-$("shareImg").addEventListener("click", async () => {
-  if (!S.blob) return;
-  if (S.canShare) {
-    try { await navigator.share({ files: [S.file] }); return; }
-    catch (e) { if (e.name === "AbortError") return; }
+$("seenBtn").addEventListener("click", () => S.answer && S.answer({ kind: "late" }));
+$("composer").addEventListener("submit", e => {
+  e.preventDefault();
+  const text = $("msgInput").value.trim().slice(0, 300);
+  if (!text || !S.answer) return;
+  $("msgInput").value = "";
+  S.answer({ kind: "custom", text });
+});
+$("emojiBtn").addEventListener("click", () => { $("emojiRow").hidden = !$("emojiRow").hidden; scrollDown(); });
+for (const e of EMOJI_BAR) {
+  const b = document.createElement("button");
+  b.type = "button"; b.textContent = e; b.setAttribute("aria-label", "Emoji ekle " + e);
+  b.addEventListener("click", () => {
+    const inp = $("msgInput");
+    if (inp.disabled) return;
+    const at = inp.selectionStart ?? inp.value.length;
+    inp.value = inp.value.slice(0, at) + e + inp.value.slice(inp.selectionEnd ?? at);
+    inp.focus();
+    const pos = at + e.length;
+    try { inp.setSelectionRange(pos, pos); } catch (err) {}
+  });
+  $("emojiRow").append(b);
+}
+// Tap a received message to leave a reaction on it.
+$("chat").addEventListener("click", e => {
+  if (e.target.closest("button")) return;
+  const msg = e.target.closest(".msg.in");
+  const open = $("chat").querySelector(".react-picker");
+  if (open) open.remove();
+  if (!msg || msg.classList.contains("typing") || msg.classList.contains("deleted")) return;
+  const picker = document.createElement("div");
+  picker.className = "react-picker";
+  for (const em of REACT_PICK) {
+    const b = document.createElement("button");
+    b.type = "button"; b.textContent = em; b.setAttribute("aria-label", "Tepki ver " + em);
+    b.addEventListener("click", () => { react(msg, em); sfx.pop(); picker.remove(); });
+    picker.append(b);
   }
-  downloadImage();
+  msg.after(picker);
+  if (msg === $("chat").lastElementChild.previousElementSibling) scrollDown();
 });
 renderSoundBtn();
-$("quit").addEventListener("click", () => { S.run++; clearInterval(timer); show("start"); });
+$("quit").addEventListener("click", () => { S.run++; S.answer = null; setComposer(false); show("start"); });
 $("copy").addEventListener("click", async () => {
   try {
     await navigator.clipboard.writeText($("shareText").textContent);
@@ -903,15 +1115,26 @@ $("copy").addEventListener("click", async () => {
     $("copy").textContent = "Metni seçtim, kopyala";
   }
 });
+$("shareImg").addEventListener("click", async () => {
+  if (!S.blob) return;
+  if (S.canShare) {
+    try { await navigator.share({ files: [S.file] }); return; }
+    catch (e) { if (e.name === "AbortError") return; }
+  }
+  downloadImage();
+});
 
 const doodles = ["🖨️", "⛽", "🔌", "📦", "☕", "🔋", "📡", "🎧", "🔑", "📺", "🧺", "🎂"];
 const doodleSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300">' + doodles.map((e, i) =>
   '<text x="' + (18 + (i % 4) * 72 + (i % 2) * 8) + '" y="' + (58 + Math.floor(i / 4) * 92 + (i % 3) * 12) + '" font-size="30" transform="rotate(' + ((i * 37) % 50 - 25) + ' ' + (32 + (i % 4) * 72) + ' ' + (48 + Math.floor(i / 4) * 92) + ')">' + e + '</text>').join("") + '</svg>';
 document.documentElement.style.setProperty("--doodle", 'url("data:image/svg+xml,' + encodeURIComponent(doodleSvg) + '")');
 
+// Link like .../#reyhan or .../#reyhan-ayse fills one or both names.
 let fromHash = "";
 try { fromHash = decodeURIComponent(location.hash.slice(1)); } catch (e) {}
-$("nameInput").value = /^[a-zA-Z-]{1,16}$/.test(fromHash) ? trCap(fromHash) : (store.get("kz-name") || "");
+const hashNames = /^[a-zA-Z]{1,16}(-[a-zA-Z]{1,16})?$/.test(fromHash) ? fromHash.split("-").map(trCap) : [];
+$("nameInput").value = hashNames[0] || store.get("kz-name") || "";
+$("name2Input").value = hashNames[1] || store.get("kz-name2") || "";
 </script>
 </body>
 </html>
