@@ -1,0 +1,6 @@
+{
+  "name": "kardes-zorbalama",
+  "compatibility_date": "2026-10-01",
+  "assets": { "directory": "." },
+  "routes": [{ "pattern": "kardeszorbala.hepsihikaye.net", "custom_domain": true }]
+}

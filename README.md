@@ -2,6 +2,6 @@
 
 Kardeşin dert anlatır, sen en bariz soruyu en hızlı şekilde sorarsın. "Kutunun kapağını açmış mıydın?"
 
-**Oyna:** https://elnidal.github.io/kardes-zorbalama/
+**Oyna:** https://kardeszorbala.hepsihikaye.net/
 
-Linkin sonuna isim ekleyebilirsin: `.../kardes-zorbalama/#ayse` ya da iki kardeş için `.../kardes-zorbalama/#ayse-zeynep`
+Linkin sonuna isim ekleyebilirsin: `kardeszorbala.hepsihikaye.net/#ayse` ya da iki kardeş için `kardeszorbala.hepsihikaye.net/#ayse-zeynep`
