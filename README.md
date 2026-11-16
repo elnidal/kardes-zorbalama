@@ -5,3 +5,5 @@ Kardeşin dert anlatır, sen en bariz soruyu en hızlı şekilde sorarsın. "Kut
 **Oyna:** https://kardeszorbala.hepsihikaye.net/
 
 Linkin sonuna isim ekleyebilirsin: `kardeszorbala.hepsihikaye.net/#ayse` ya da iki kardeş için `kardeszorbala.hepsihikaye.net/#ayse-zeynep`
+
+GitHub'da `main` dalına gönderilen her değişiklik Cloudflare'e kendiliğinden yüklenir.
